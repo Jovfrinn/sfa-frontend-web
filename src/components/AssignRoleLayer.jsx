@@ -1,6 +1,6 @@
 import { Icon } from "@iconify/react/dist/iconify.js";
 import axios from "axios";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 const AssignRoleLayer = () => {
   const api = import.meta.env.VITE_API_URI;
@@ -14,8 +14,11 @@ const AssignRoleLayer = () => {
   const [editingId, setEditingId]     = useState(null);
   const [selectedRole, setSelectedRole] = useState("");
   const [saving, setSaving]   = useState(false);
+  const [fetchError, setFetchError] = useState(null);
+  const searchTimeout = useRef(null);
 
   const fetchUsers = async (s = "") => {
+    setFetchError(null);
     setLoading(true);
     try {
       const res = await axios.get(`${api}/user/list`, {
@@ -24,6 +27,7 @@ const AssignRoleLayer = () => {
       setUsers(res.data?.data?.data ?? []);
     } catch (e) {
       console.error(e);
+      setFetchError("Gagal memuat data user");
     } finally {
       setLoading(false);
     }
@@ -39,8 +43,10 @@ const AssignRoleLayer = () => {
   useEffect(() => { fetchUsers(); fetchRoles(); }, []);
 
   const handleSearch = (e) => {
-    setSearch(e.target.value);
-    fetchUsers(e.target.value);
+    const value = e.target.value;
+    setSearch(value);
+    clearTimeout(searchTimeout.current);
+    searchTimeout.current = setTimeout(() => fetchUsers(value), 300);
   };
 
   const startEdit = (user) => {
@@ -56,6 +62,7 @@ const AssignRoleLayer = () => {
       fetchUsers(search);
     } catch (e) {
       console.error(e);
+      alert(e.response?.data?.message ?? "Gagal menyimpan role");
     } finally {
       setSaving(false);
     }
@@ -73,6 +80,7 @@ const AssignRoleLayer = () => {
         </div>
       </div>
       <div className="card-body p-24">
+        {fetchError && <div className="alert alert-danger">{fetchError}</div>}
         {loading ? (
           <p className="text-center text-secondary-light">Memuat data...</p>
         ) : (
@@ -121,7 +129,7 @@ const AssignRoleLayer = () => {
                           <button className="btn btn-sm btn-primary px-12" onClick={() => saveRole(user.id)} disabled={saving}>
                             {saving ? "..." : "Simpan"}
                           </button>
-                          <button className="btn btn-sm btn-outline-secondary px-12" onClick={() => setEditingId(null)}>
+                          <button className="btn btn-sm btn-outline-secondary px-12" onClick={() => setEditingId(null)} disabled={saving}>
                             Batal
                           </button>
                         </div>

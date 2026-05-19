@@ -4,6 +4,18 @@ import axios from "axios";
 import { useEffect, useState } from "react";
 import { Icon } from "@iconify/react/dist/iconify.js";
 
+const getDescendantIds = (roleId, allRoles) => {
+  const result = [];
+  const queue = [roleId];
+  while (queue.length) {
+    const id = queue.shift();
+    const children = allRoles.filter(r => r.parent_id === id).map(r => r.id);
+    result.push(...children);
+    queue.push(...children);
+  }
+  return result;
+};
+
 const RolePage = () => {
   const api = import.meta.env.VITE_API_URI;
   const token = localStorage.getItem("token");
@@ -22,7 +34,7 @@ const RolePage = () => {
     try {
       const res = await axios.get(`${api}/roles`, { headers });
       setRoles(res.data?.data ?? []);
-    } catch (e) { console.error(e); }
+    } catch (e) { console.error(e); setError("Gagal memuat data role"); }
     finally { setLoading(false); }
   };
 
@@ -157,11 +169,14 @@ const RolePage = () => {
                   <select className="form-control radius-8 form-select"
                     value={form.parent_id} onChange={(e) => setForm({ ...form, parent_id: e.target.value })}>
                     <option value="">— Tidak ada parent (top-level) —</option>
-                    {roles
-                      .filter((r) => r.id !== editRole?.id)
-                      .map((r) => (
-                        <option key={r.id} value={r.id}>{r.name}</option>
-                      ))}
+                    {(() => {
+                      const excludeIds = editRole ? [editRole.id, ...getDescendantIds(editRole.id, roles)] : [];
+                      return roles
+                        .filter((r) => !excludeIds.includes(r.id))
+                        .map((r) => (
+                          <option key={r.id} value={r.id}>{r.name}</option>
+                        ));
+                    })()}
                   </select>
                 </div>
               </div>
