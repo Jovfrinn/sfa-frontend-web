@@ -21,6 +21,8 @@ import SellingOut from "../pages/market-size/SellingOut";
 import SellingOutGlobal from "../pages/market-size/SellingOutGlobal";
 import SellingOutNonGlobal from "../pages/market-size/SellingOutNonGlobal";
 import CompetitorBrand from "../pages/competitor-brand/CompetitorBrand";
+import UserManagementPage from "../pages/master/UserManagementPage";
+import RolePage from "../pages/master/RolePage";
 
 export default function AppRoutes() {
   return (
@@ -31,6 +33,8 @@ export default function AppRoutes() {
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/master/company" element={<Company />} />
         <Route path="/master/company/tree" element={<CompanyTree />} />
+        <Route path="/master/users" element={<UserManagementPage />} />
+        <Route path="/master/roles" element={<RolePage />} />
 
         <Route path="/master/inventory/list" element={<Inventory />} />
         <Route path="/master/inventory/brand" element={<BrandInventory />} />
