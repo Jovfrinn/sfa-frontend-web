@@ -5,6 +5,7 @@ import Select from "react-select";
 import Loader from "../loader/loader";
 import { Tooltip, OverlayTrigger } from "react-bootstrap";
 import AsyncSelect from "react-select/async";
+import VisitDetailModal from "./VisitDetailModal";
 
 const VisitTable = () => {
   const formatDate = (date) => {
@@ -45,6 +46,7 @@ const VisitTable = () => {
 
   const [userRole, setUserRole] = useState(localStorage.getItem("role") ?? "");
   const isManager = userRole.toLowerCase().includes("manager");
+  const [selectedTapInId, setSelectedTapInId] = useState(null);
 
 
   const fetchMe = async () => {
@@ -480,6 +482,7 @@ const VisitTable = () => {
                     <th>Result POSM</th>
                     <th>Photo POSM</th>
                     <th>Result</th>
+                    <th>Aksi</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -533,6 +536,14 @@ const VisitTable = () => {
                           )}
                         </td>
                         <td>{v.result ?? "-"}</td>
+                        <td>
+                          <button
+                            className="btn btn-sm btn-outline-primary"
+                            onClick={() => setSelectedTapInId(v.id)}
+                          >
+                            Detail
+                          </button>
+                        </td>
                       </tr>
                     ))
                   ) : (
@@ -584,6 +595,12 @@ const VisitTable = () => {
           </div>
         </div>
       </div>
+      {selectedTapInId && (
+        <VisitDetailModal
+          tapInId={selectedTapInId}
+          onClose={() => setSelectedTapInId(null)}
+        />
+      )}
     </>
   );
 };
