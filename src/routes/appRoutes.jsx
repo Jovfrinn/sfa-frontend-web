@@ -24,6 +24,7 @@ import CompetitorBrand from "../pages/competitor-brand/CompetitorBrand";
 import UserManagementPage from "../pages/master/UserManagementPage";
 import InteractionLogPage from "../pages/crm/InteractionLogPage";
 import Customer360Page from "../pages/crm/Customer360Page";
+import FollowUpPage from "../pages/crm/FollowUpPage";
 
 export default function AppRoutes() {
   return (
@@ -56,6 +57,7 @@ export default function AppRoutes() {
 
         <Route path="/crm/interaction-logs" element={<InteractionLogPage />} />
         <Route path="/crm/customer/:id" element={<Customer360Page />} />
+        <Route path="/crm/follow-up" element={<FollowUpPage />} />
 
         <Route path="/menu/report/visit" element={<Visit />} />
         <Route path="/menu/pre-order" element={<PreOrder />} />

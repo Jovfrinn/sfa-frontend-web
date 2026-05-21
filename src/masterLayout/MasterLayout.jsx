@@ -535,6 +535,19 @@ const MasterLayout = ({ children }) => {
                 <span>Interaction Log</span>
               </Link>
             </li>
+
+            {/* Follow-up Reminder */}
+            <li>
+              <Link
+                to="/crm/follow-up"
+                className={
+                  pathname.includes("follow-up") ? "active-page" : ""
+                }
+              >
+                <Icon icon="lucide:bell-ring" className="menu-icon" />
+                <span>Follow-up</span>
+              </Link>
+            </li>
           </ul>
         </div>
       </aside>
