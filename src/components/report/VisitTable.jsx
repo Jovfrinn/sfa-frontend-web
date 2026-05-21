@@ -91,7 +91,6 @@ const VisitTable = () => {
           Authorization: `Bearer ${token}`,
         },
       });
-      console.log(params.toString());
       const { data, current_page, links, last_page, per_page, total } = res.data.data;
       setCurrentData(data);
       setLinks(links);
@@ -491,7 +490,7 @@ const VisitTable = () => {
                       <tr key={i}>
                         <td>{(page - 1) * perPage + (i + 1)}</td>
                         <td>{v.user.full_name}</td>
-                        <td>{v.user.role ? v.user.role.toUpperCase().replace(/-/g, " ") : "-"}</td>
+                        <td>{v.user.role ? v.user.role.name : "-"}</td>
                         <td>{v.user.company.name}</td>
                         <td>{v.master_customer.name}</td>
                         <td>{getStatusBadge(v.master_customer.status)}</td>
