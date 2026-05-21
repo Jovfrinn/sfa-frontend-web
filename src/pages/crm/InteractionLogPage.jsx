@@ -53,14 +53,18 @@ export default function InteractionLogPage() {
   };
 
   const handleFilterReset = () => {
-    setFilters({ status: "", from: "", to: "", search: "" });
+    const cleared = { status: "", from: "", to: "", search: "" };
+    setFilters(cleared);
+    // Call fetchLogs with cleared params directly (don't rely on state update side effect)
+    setLoading(true);
+    axios
+      .get(`${API_URL}/interaction-logs`, {
+        headers: { Authorization: `Bearer ${token}` },
+      })
+      .then((res) => setLogs(res.data.data ?? []))
+      .catch(() => {})
+      .finally(() => setLoading(false));
   };
-
-  useEffect(() => {
-    if (!filters.status && !filters.from && !filters.to && !filters.search) {
-      fetchLogs();
-    }
-  }, [filters]);
 
   return (
     <MasterLayout>
