@@ -3,6 +3,7 @@ import { Modal, Button } from "react-bootstrap";
 import { useState } from "react";
 import axios from "axios";
 import Swal from "sweetalert2";
+import InteractionLogList from "../crm/InteractionLogList";
 
 const CustomerModalDetail = ({
   initialData,
@@ -11,6 +12,7 @@ const CustomerModalDetail = ({
   statuses = "unregis",
 }) => {
   const [show, setShow] = useState(true);
+  const [activeTab, setActiveTab] = useState("detail");
   const [reason, setReason] = useState(false);
   const [approve, setApprove] = useState(false);
   const [reasonMessage, setReasonMessage] = useState({
@@ -181,6 +183,37 @@ const CustomerModalDetail = ({
           <Modal.Title>Detail Customer</Modal.Title>
         </Modal.Header>
         <Modal.Body>
+          {/* Tab Navigation */}
+          <ul className="nav nav-tabs mb-3 px-2 pt-1">
+            <li className="nav-item">
+              <button
+                className={`nav-link ${activeTab === "detail" ? "active" : ""}`}
+                onClick={() => setActiveTab("detail")}
+                type="button"
+              >
+                Detail
+              </button>
+            </li>
+            <li className="nav-item">
+              <button
+                className={`nav-link ${activeTab === "interaksi" ? "active" : ""}`}
+                onClick={() => setActiveTab("interaksi")}
+                type="button"
+              >
+                Interaksi
+              </button>
+            </li>
+          </ul>
+
+          {/* Tab: Interaksi */}
+          {activeTab === "interaksi" && (
+            <div className="tab-pane active px-2">
+              <InteractionLogList customerId={initialData?.id} />
+            </div>
+          )}
+
+          {/* Tab: Detail */}
+          {activeTab === "detail" && (
           <div className="p-2">
             {/* Informasi Perusahaan */}
             <div className="mb-4">
@@ -510,6 +543,7 @@ const CustomerModalDetail = ({
               </form>
             )}
           </div>
+          )} {/* end tab: detail */}
         </Modal.Body>
         <Modal.Footer className="d-flex justify-content-between">
           {reason ? (
