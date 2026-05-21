@@ -25,22 +25,32 @@ export default function Customer360Page() {
   const [customer, setCustomer] = useState(null);
   const [visits, setVisits] = useState([]);
   const [loading, setLoading] = useState(true);
-  const token = localStorage.getItem("token");
+  const [fetchError, setFetchError] = useState(false);
 
   useEffect(() => {
     if (!id) return;
+    const controller = new AbortController();
+    const token = localStorage.getItem("token");
     const headers = { Authorization: `Bearer ${token}` };
+    const opts = { headers, signal: controller.signal };
+
+    setLoading(true);
+    setFetchError(false);
 
     Promise.all([
-      axios.get(`${API_URL}/customers/show/${id}`, { headers }),
-      axios.get(`${API_URL}/tap-out/by-customer/${id}`, { headers }),
+      axios.get(`${API_URL}/customers/show/${id}`, opts),
+      axios.get(`${API_URL}/tap-out/by-customer/${id}`, opts),
     ])
       .then(([custRes, visitRes]) => {
         setCustomer(custRes.data.data ?? null);
         setVisits(visitRes.data.data ?? []);
       })
-      .catch(() => {})
+      .catch((err) => {
+        if (!axios.isCancel(err)) setFetchError(true);
+      })
       .finally(() => setLoading(false));
+
+    return () => controller.abort();
   }, [id]);
 
   if (loading) {
@@ -51,7 +61,7 @@ export default function Customer360Page() {
     );
   }
 
-  if (!customer) {
+  if (fetchError || !customer) {
     return (
       <MasterLayout>
         <p className="text-danger text-center py-5">Outlet tidak ditemukan atau akses ditolak.</p>
@@ -124,8 +134,8 @@ export default function Customer360Page() {
                 <div>
                   <p className="text-secondary-light mb-0 small">Pre-Order</p>
                   <h5 className="fw-bold mb-0">
-                    {customer.preorder_summary.total_po} PO
-                    {customer.preorder_summary.last_po_date && (
+                    {customer.preorder_summary?.total_po ?? 0} PO
+                    {customer.preorder_summary?.last_po_date && (
                       <span className="text-secondary-light fw-normal fs-6 ms-2">
                         terakhir {customer.preorder_summary.last_po_date}
                       </span>
