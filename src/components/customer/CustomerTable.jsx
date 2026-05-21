@@ -1,5 +1,6 @@
 import axios from "axios";
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Icon } from "@iconify/react";
 import CustomerForm from "./CustomerForm";
 import Select from "react-select";
@@ -10,6 +11,7 @@ import { Tooltip, OverlayTrigger } from "react-bootstrap";
 import ExcelUploadModal from "./ExcelUploadModal";
 
 const CustomerTable = ({ status }) => {
+  const navigate = useNavigate();
   const [search, setSearch] = useState("");
   const [currentData, setCurrentData] = useState([]);
   const [page, setPage] = useState(1);
@@ -355,6 +357,14 @@ const CustomerTable = ({ status }) => {
                             </td>
                             <td>
                               <div className="d-flex align-items-center gap-1">
+                                <button
+                                  className="btn btn-outline-secondary btn-sm d-flex align-items-center"
+                                  style={{ borderRadius: 7 }}
+                                  onClick={() => navigate(`/crm/customer/${item.id}`)}
+                                  title="Lihat Customer 360"
+                                >
+                                  <Icon icon="lucide:layout-dashboard" width={15} />
+                                </button>
                                 {status === "unregis" ? (
                                   <>
                                     <button className="btn btn-success btn-sm d-flex align-items-center" style={{ borderRadius: 7 }} onClick={() => { setSelectedCustomer(item); setIsModalVisible(true); }}>
