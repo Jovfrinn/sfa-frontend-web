@@ -15,19 +15,23 @@ function formatDuration(tapIn, tapOut) {
 
 export default function Customer360VisitList({ customerId }) {
   const [visits, setVisits] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(!!customerId);
   const [selectedTapInId, setSelectedTapInId] = useState(null);
-  const token = localStorage.getItem("token");
 
   useEffect(() => {
     if (!customerId) return;
+    const controller = new AbortController();
+    const token = localStorage.getItem("token");
+    setLoading(true);
     axios
       .get(`${API_URL}/tap-out/by-customer/${customerId}`, {
         headers: { Authorization: `Bearer ${token}` },
+        signal: controller.signal,
       })
       .then((res) => setVisits(res.data.data ?? []))
       .catch(() => {})
       .finally(() => setLoading(false));
+    return () => controller.abort();
   }, [customerId]);
 
   if (loading) return <p className="text-muted text-center py-3">Memuat...</p>;
