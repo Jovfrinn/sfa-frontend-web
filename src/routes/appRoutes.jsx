@@ -22,6 +22,7 @@ import SellingOutGlobal from "../pages/market-size/SellingOutGlobal";
 import SellingOutNonGlobal from "../pages/market-size/SellingOutNonGlobal";
 import CompetitorBrand from "../pages/competitor-brand/CompetitorBrand";
 import UserManagementPage from "../pages/master/UserManagementPage";
+import InteractionLogPage from "../pages/crm/InteractionLogPage";
 
 export default function AppRoutes() {
   return (
@@ -51,6 +52,8 @@ export default function AppRoutes() {
 
         {/* <Route path="/menu/journey-plan" element={<JourneyPlan />} /> */}
         <Route path="/menu/journey-plan" element={<JourneyPlanTable />} />
+
+        <Route path="/crm/interaction-logs" element={<InteractionLogPage />} />
 
         <Route path="/menu/report/visit" element={<Visit />} />
         <Route path="/menu/pre-order" element={<PreOrder />} />

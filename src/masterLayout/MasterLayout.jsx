@@ -520,6 +520,21 @@ const MasterLayout = ({ children }) => {
                 <span>Summary Visit</span>
               </Link>
             </li> */}
+
+            <li className="sidebar-menu-group-title ms-2">CRM</li>
+
+            {/* Interaction Log */}
+            <li>
+              <Link
+                to="/crm/interaction-logs"
+                className={
+                  pathname.includes("interaction-logs") ? "active-page" : ""
+                }
+              >
+                <Icon icon="tabler:message-report" className="menu-icon" />
+                <span>Interaction Log</span>
+              </Link>
+            </li>
           </ul>
         </div>
       </aside>
