@@ -33,7 +33,7 @@ export default function InteractionLogList({ customerId }) {
   };
 
   useEffect(() => {
-    fetchLogs();
+    if (customerId) fetchLogs();
   }, [customerId]);
 
   const handleDelete = (id) => {
@@ -55,7 +55,7 @@ export default function InteractionLogList({ customerId }) {
           Swal.fire({
             icon: "error",
             title: "Gagal menghapus",
-            text: err.response?.data?.message,
+            text: err.response?.data?.message ?? err.message,
           });
         }
       }
