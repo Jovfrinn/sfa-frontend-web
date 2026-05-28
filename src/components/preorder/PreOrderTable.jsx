@@ -169,6 +169,19 @@ export const PreOrderTable = () => {
   const indexLastRow = page * perPage;
   const indexOfFirstRow = indexLastRow - perPage;
 
+  const H = "36px";
+  const B = "1px solid #e2e8f0";
+  const R = "8px";
+  const F = "13px";
+
+  const selectStyles = {
+    control: (base) => ({ ...base, minHeight: H, height: H, borderColor: "#e2e8f0", borderRadius: R, fontSize: F, boxShadow: "none", "&:hover": { borderColor: "#a0aec0" } }),
+    valueContainer: (base) => ({ ...base, padding: "0 10px" }),
+    indicatorsContainer: (base) => ({ ...base, height: H }),
+    placeholder: (base) => ({ ...base, color: "#a0aec0", fontSize: F }),
+    singleValue: (base) => ({ ...base, fontSize: F }),
+  };
+
   //Handle Add
   const handleSubmitAddStock = async (e) => {
     setLoading(true);
@@ -465,6 +478,23 @@ export const PreOrderTable = () => {
 
   return (
     <>
+      <style>{`
+        .table-row:hover { cursor: pointer; background: #f8fafc !important; }
+        .user-table th { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; color: #64748b; background: #f8fafc; border-bottom: 2px solid #e2e8f0; padding: 10px 12px; white-space: nowrap; }
+        .user-table td { font-size: 13px; color: #334155; padding: 10px 12px; border-bottom: 1px solid #f1f5f9; vertical-align: middle; }
+        .act-btn { height: ${H}; width: ${H}; border-radius: ${R}; border: ${B}; display: flex; align-items: center; justify-content: center; cursor: pointer; background: #fff; color: #64748b; }
+        .act-btn:hover { background: #f1f5f9; }
+        .act-btn.blue { background: #dbeafe; border-color: #93c5fd; color: #2563eb; }
+        .act-btn.blue:hover { background: #bfdbfe; }
+        .act-btn.green { background: #dcfce7; border-color: #86efac; color: #16a34a; }
+        .act-btn.green:hover { background: #bbf7d0; }
+        .search-input { height: ${H}; border: ${B}; border-radius: ${R}; padding: 0 12px 0 34px; font-size: ${F}; outline: none; width: 190px; color: #334155; background: #fff; }
+        .search-input:focus { border-color: #3b82f6; box-shadow: 0 0 0 3px rgba(59,130,246,.1); }
+        .search-wrap { position: relative; display: flex; align-items: center; }
+        .search-wrap .s-icon { position: absolute; left: 10px; color: #94a3b8; pointer-events: none; }
+        .fdivider { width: 1px; height: 20px; background: #e2e8f0; flex-shrink: 0; }
+      `}</style>
+      
       {loading && <Loader />}
       <Modal
         show={showClick}
@@ -581,181 +611,186 @@ export const PreOrderTable = () => {
       </Modal>
 
       <div className="col-lg-12">
-        <div className="card h-100 ">
-          <div className="card-header">
-            <h5 className="card-title mb-0">PO</h5>
+        <div className="card h-100" style={{ borderRadius: "12px", border: "1px solid #e2e8f0", boxShadow: "0 1px 6px rgba(0,0,0,0.06)" }}>
+          <div className="card-header d-flex justify-content-between align-items-center" style={{ background: "#fff", borderBottom: "1px solid #f1f5f9", borderRadius: "12px 12px 0 0", padding: "14px 18px" }}>
+            <div className="d-flex align-items-center gap-2">
+              <div style={{ width: 3, height: 18, background: "#3b82f6", borderRadius: 3 }} />
+              <h5 className="card-title mb-0" style={{ fontSize: "15px", fontWeight: 600, color: "#1e293b" }}>PO</h5>
+            </div>
           </div>
-          <div className="card-body body-po">
-            <div className="d-flex justify-content-between mb-3 header-po">
-              <div>
-                <label className="me-2 show">Show</label>
-                <Select
-                  options={[
-                    { value: 10, label: "10" },
-                    { value: 20, label: "20" },
-                    { value: 50, label: "50" },
-                  ]}
-                  onChange={(selectedOption) => {
-                    setPerPage(Number(selectedOption.value));
-                  }}
-                  classNamePrefix="po-select"
-                  defaultValue={{ value: perPage, label: `${perPage}` }}
-                  className="d-inline-block w-auto"
-                />
+          
+          <div className="card-body" style={{ padding: "14px 18px" }}>
+            
+            <div className="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-3" style={{ background: "#fff", border: "1px solid #e2e8f0", borderRadius: "10px", padding: "10px 14px" }}>
+              <div className="d-flex align-items-center gap-2 flex-wrap">
+                <div className="d-flex align-items-center">
+                  <span className="me-2" style={{ fontSize: "13px", color: "#64748b" }}>Show</span>
+                  <Select
+                    options={[
+                      { value: 10, label: "10" },
+                      { value: 20, label: "20" },
+                      { value: 50, label: "50" },
+                    ]}
+                    onChange={(selectedOption) => {
+                      setPerPage(Number(selectedOption.value));
+                    }}
+                    value={{ value: perPage, label: `${perPage}` }}
+                    classNamePrefix="select"
+                    className="d-inline-block w-auto"
+                    styles={selectStyles}
+                  />
+                </div>
               </div>
 
               <div className="d-flex align-items-center gap-2">
-                <input
-                  type="text"
-                  placeholder="Search..."
-                  className="form-control search"
-                  value={search}
-                  onChange={(e) => setSearch(e.target.value)}
-                />
+                <div className="search-wrap">
+                  <Icon icon="mdi:magnify" className="s-icon" fontSize={16} />
+                  <input
+                    type="text"
+                    placeholder="Search..."
+                    className="search-input"
+                    value={search}
+                    onChange={(e) => setSearch(e.target.value)}
+                  />
+                </div>
+                
                 {filter && (
-                  <div>
-                    <button
-                      className="btn btn-success button-fiture-inventory d-flex align-items-center justify-content-center export"
-                      onClick={() => {
-                        handleDownload(
-                          filterSelected.selectedItem,
-                          filterSelected.selectedCustomer,
-                          filterSelected.selectedCompany,
-                          startDate,
-                          endDate
-                        );
-                      }}
-                    >
-                      <Icon
-                        icon={"mdi:file-export-outline"}
-                        fontSize={24}
-                        className="icon"
-                      />
-                    </button>
-                  </div>
+                  <button
+                    className="act-btn green"
+                    title="Export"
+                    onClick={() => {
+                      handleDownload(
+                        filterSelected.selectedItem,
+                        filterSelected.selectedCustomer,
+                        filterSelected.selectedCompany,
+                        startDate,
+                        endDate
+                      );
+                    }}
+                  >
+                    <Icon icon="mdi:file-export-outline" fontSize={18} />
+                  </button>
                 )}
+                
                 <button
-                  className="btn btn-outline-secondary d-flex align-items-center justify-content-center filter"
-                  onClick={() => {
-                    filter ? setFilter(false) : setFilter(true);
-                  }}
+                  className={`act-btn ${filter ? 'blue' : ''}`}
+                  onClick={() => setFilter(!filter)}
+                  title="Filter"
                 >
-                  <Icon icon="line-md:filter" fontSize={24} className="icon" />
+                  <Icon icon="line-md:filter" fontSize={18}/>
                 </button>
+
+                <div className="fdivider"></div>
+
                 <button
                   onClick={() => {
                     setMode("add");
                     setShowClick(true);
                   }}
-                  className="btn btn-outline-primary w-50 d-flex align-items-center justify-content-center create"
+                  className="act-btn blue"
+                  title="Create PO"
                 >
-                  <Icon icon="zondicons:add-outline" fontSize={22} />
+                  <Icon icon="zondicons:add-outline" fontSize={18} />
                 </button>
               </div>
             </div>
 
             {/* filter */}
             {filter && (
-              <>
-                <div className="row justify-content-between align-items-center my-3 filter-po">
-                  <div className="d-flex justify-content-center col-md-6 my-1">
-                    <AsyncSelect
-                      cacheOptions
-                      defaultOptions
-                      isClearable
-                      className="filter-stock"
-                      loadOptions={getCompany}
-                      value={filterSelected.selectedCompany}
-                      onChange={(option) =>
-                        setFilterSelected({
-                          ...filterSelected,
-                          selectedCompany: option,
-                        })
-                      }
-                      placeholder="Pilih Company"
-                    />
-                  </div>
-                  <div className="d-flex justify-content-center col-md-6 my-1">
-                    <AsyncSelect
-                      cacheOptions
-                      defaultOptions
-                      isClearable
-                      className="filter-stock"
-                      loadOptions={getCustomers}
-                      value={filterSelected.selectedCustomer}
-                      onChange={(option) =>
-                        setFilterSelected({
-                          ...filterSelected,
-                          selectedCustomer: option,
-                        })
-                      }
-                      placeholder="Pilih Customer"
-                    />
-                  </div>
-                  <div className="d-flex justify-content-center col-md-6 my-1">
-                    <AsyncSelect
-                      cacheOptions
-                      defaultOptions
-                      isClearable
-                      className="filter-stock"
-                      loadOptions={getInventory}
-                      value={filterSelected.selectedItem}
-                      onChange={(option) =>
-                        setFilterSelected({
-                          ...filterSelected,
-                          selectedItem: option,
-                        })
-                      }
-                      placeholder="Pilih Barang"
-                    />
-                  </div>
+              <div className="row g-2 mb-3" style={{ background: "#f8fafc", padding: "12px", borderRadius: "8px", border: "1px solid #e2e8f0" }}>
+                <div className="col-md-6 col-lg-3">
+                  <AsyncSelect
+                    cacheOptions
+                    defaultOptions
+                    isClearable
+                    loadOptions={getCompany}
+                    value={filterSelected.selectedCompany}
+                    onChange={(option) =>
+                      setFilterSelected({
+                        ...filterSelected,
+                        selectedCompany: option,
+                      })
+                    }
+                    placeholder="Pilih Company"
+                    styles={selectStyles}
+                  />
+                </div>
+                <div className="col-md-6 col-lg-3">
+                  <AsyncSelect
+                    cacheOptions
+                    defaultOptions
+                    isClearable
+                    loadOptions={getCustomers}
+                    value={filterSelected.selectedCustomer}
+                    onChange={(option) =>
+                      setFilterSelected({
+                        ...filterSelected,
+                        selectedCustomer: option,
+                      })
+                    }
+                    placeholder="Pilih Customer"
+                    styles={selectStyles}
+                  />
+                </div>
+                <div className="col-md-6 col-lg-3">
+                  <AsyncSelect
+                    cacheOptions
+                    defaultOptions
+                    isClearable
+                    loadOptions={getInventory}
+                    value={filterSelected.selectedItem}
+                    onChange={(option) =>
+                      setFilterSelected({
+                        ...filterSelected,
+                        selectedItem: option,
+                      })
+                    }
+                    placeholder="Pilih Barang"
+                    styles={selectStyles}
+                  />
+                </div>
 
-                  <div
-                    className="d-flex justify-content-center col-md-6 my-1"
-                    style={{ position: "relative" }}
+                <div className="col-md-6 col-lg-3" style={{ position: "relative" }}>
+                  <button
+                    type="button"
+                    className="form-control"
+                    style={{ height: H, borderColor: "#e2e8f0", borderRadius: R, fontSize: F, textAlign: "left", background: "#fff", color: (!startDate || !endDate) ? "#a0aec0" : "#334155" }}
+                    onClick={handleCalendarOpen}
                   >
+                    {!startDate || !endDate
+                      ? "Pilih tanggal"
+                      : `${startDate} - ${endDate}`}
+                  </button>
+                  {startDate && endDate && (
                     <button
                       type="button"
-                      className="form-control input-date-trigger"
-                      onClick={handleCalendarOpen}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setStartDate(null);
+                        setEndDate(null);
+                      }}
+                      style={{
+                        position: "absolute",
+                        right: "15px",
+                        top: "50%",
+                        transform: "translateY(-50%)",
+                        background: "none",
+                        border: "none",
+                        cursor: "pointer",
+                        fontSize: "18px",
+                        color: "#94a3b8",
+                        padding: "0 5px",
+                      }}
                     >
-                      {!startDate || !endDate
-                        ? "Pilih tanggal"
-                        : `${startDate} - ${endDate}`}
+                      &times;
                     </button>
-                    {startDate && endDate && (
-                      <button
-                        type="button"
-                        className="btn-clear-date"
-                        onClick={(e) => {
-                          e.stopPropagation();
-
-                          setStartDate(null);
-                          setEndDate(null);
-                        }}
-                        style={{
-                          position: "absolute",
-                          right: "25px",
-                          top: "50%",
-                          transform: "translateY(-46%)",
-                          background: "none",
-                          border: "none",
-                          cursor: "pointer",
-                          fontSize: "16px",
-                          color: "#999",
-                          padding: "0 5px",
-                        }}
-                      >
-                        &times; {/* Entitas HTML untuk simbol 'x' */}
-                      </button>
-                    )}
-                  </div>
+                  )}
                 </div>
-              </>
+              </div>
             )}
 
             <div className="table-responsive">
-              <table className="table basic-border-table mb-0">
+              <table className="table user-table mb-0">
                 <thead>
                   <tr>
                     <th>No</th>
@@ -764,16 +799,16 @@ export const PreOrderTable = () => {
                     <th>Quantity</th>
                     <th>Unit</th>
                     <th>Tanggal</th>
-                    <th id="action">Action</th>
+                    <th className="text-center">Action</th>
                   </tr>
                 </thead>
 
                 <tbody>
                   {currentData.length > 0 ? (
                     currentData.map((item, index) => (
-                      <tr key={item.id}>
-                        <td>{indexOfFirstRow + index + 1}</td>
-                        <td>{item.master_customer.name}</td>
+                      <tr key={item.id} className="table-row">
+                        <td style={{ color: "#94a3b8" }}>{indexOfFirstRow + index + 1}</td>
+                        <td style={{ fontWeight: 600, color: "#1e293b" }}>{item.master_customer.name}</td>
                         <td>{item.master_inventory.nama}</td>
                         <td>{item.quantity ? item.quantity : "-"}</td>
                         <td>{item.unit ? item.unit : "-"}</td>
@@ -789,34 +824,37 @@ export const PreOrderTable = () => {
                                 .replace(/(\d{4})-(\d{2})-(\d{2})/, "$1-$2-$3")
                             : "-"}
                         </td>
-                        <td className="d-flex align-items-center">
-                          <button
-                            className="btn btn-warning btn-sm me-2 d-flex align-items-center"
-                            onClick={() => {
-                              setMode("edit");
-                              setSelectedPO(item);
-                              setShowClick(true);
-                              setSelectedQuantity(item.quantity);
-                              setSelectedUnit(item.quantity);
-                            }}
-                          >
-                            <Icon icon="mdi:pencil" width={18} />
-                          </button>
-                          <button
-                            className="btn btn-danger btn-sm d-flex align-items-center"
-                            onClick={() => handleDelete(item.id)}
-                          >
-                            <Icon
-                              icon="material-symbols:delete-outline"
-                              width={18}
-                            />
-                          </button>
+                        <td>
+                          <div className="d-flex gap-2 align-items-center justify-content-center">
+                            <button
+                              className="btn btn-warning btn-sm d-flex align-items-center justify-content-center"
+                              style={{ borderRadius: "7px", width: "28px", height: "28px", padding: 0 }}
+                              onClick={() => {
+                                setMode("edit");
+                                setSelectedPO(item);
+                                setShowClick(true);
+                                setSelectedQuantity(item.quantity);
+                                setSelectedUnit(item.quantity);
+                              }}
+                              title="Edit"
+                            >
+                              <Icon icon="mdi:pencil" width={16} />
+                            </button>
+                            <button
+                              className="btn btn-danger btn-sm d-flex align-items-center justify-content-center"
+                              style={{ borderRadius: "7px", width: "28px", height: "28px", padding: 0 }}
+                              onClick={() => handleDelete(item.id)}
+                              title="Hapus"
+                            >
+                              <Icon icon="mdi:trash" width={16} />
+                            </button>
+                          </div>
                         </td>
                       </tr>
                     ))
                   ) : (
                     <tr>
-                      <td colSpan="11" className="text-center">
+                      <td colSpan="7" className="text-center py-5" style={{ color: "#94a3b8", fontSize: 14 }}>
                         {loadingTable ? "Loading..." : "Data Kosong"}
                       </td>
                     </tr>
@@ -826,52 +864,25 @@ export const PreOrderTable = () => {
             </div>
 
             {/* Pagination */}
-            <div className="d-flex justify-content-between align-items-center mt-3 pagination-section">
-              <span>
+            <div className="d-flex justify-content-between align-items-center mt-3">
+              <span style={{ fontSize: 13, color: "#64748b" }}>
                 Showing {indexOfFirstRow + 1} to {pageTo} of{" "}
                 {totalPages * perPage} entries
               </span>
-
               <nav>
-                <ul className="pagination mb-0">
+                <ul className="pagination mb-0" style={{ gap: 4 }}>
                   <li className={`page-item ${page === 1 ? "disabled" : ""}`}>
-                    <button
-                      className="page-link"
-                      onClick={() => setPage(page - 1)}
-                    >
-                      Previous
-                    </button>
+                    <button className="page-link" style={{ borderRadius: 8, fontSize: 13 }} onClick={() => setPage(page - 1)}>‹ Prev</button>
                   </li>
-
                   {getPageNumbers(page, totalPages).map((pageNumber, index) => (
-                    <li
-                      key={index}
-                      className={`page-item ${
-                        pageNumber === page ? "active" : ""
-                      } ${pageNumber === "..." ? "disabled" : ""}`}
-                    >
-                      <button
-                        className="page-link"
-                        onClick={() =>
-                          pageNumber !== "..." ? setPage(pageNumber) : null
-                        }
-                      >
+                    <li key={index} className={`page-item ${pageNumber === page ? "active" : ""} ${pageNumber === "..." ? "disabled" : ""}`}>
+                      <button className="page-link" style={{ borderRadius: 8, fontSize: 13 }} onClick={() => pageNumber !== "..." ? setPage(pageNumber) : null}>
                         {pageNumber}
                       </button>
                     </li>
                   ))}
-
-                  <li
-                    className={`page-item ${
-                      page === totalPages ? "disabled" : ""
-                    }`}
-                  >
-                    <button
-                      className="page-link"
-                      onClick={() => setPage(page + 1)}
-                    >
-                      Next
-                    </button>
+                  <li className={`page-item ${page === totalPages ? "disabled" : ""}`}>
+                    <button className="page-link" style={{ borderRadius: 8, fontSize: 13 }} onClick={() => setPage(page + 1)}>Next ›</button>
                   </li>
                 </ul>
               </nav>

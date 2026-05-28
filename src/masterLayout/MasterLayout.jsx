@@ -548,6 +548,31 @@ const MasterLayout = ({ children }) => {
                 <span>Follow-up</span>
               </Link>
             </li>
+            <li className="sidebar-menu-group-title ms-2">Setting</li>
+            {/* Role */}
+            <li>
+              <Link
+                to="/setting/role"
+                className={
+                  pathname.includes("role") ? "active-page" : ""
+                }
+              >
+                <Icon icon="tabler:user-cog" className="menu-icon" />
+                <span>Role</span>
+              </Link>
+            </li>
+            {/* User */}
+            <li>
+              <Link
+                to="/setting/user"
+                className={
+                  pathname.includes("user") ? "active-page" : ""
+                }
+              >
+                <Icon icon="lucide:user" className="menu-icon" />
+                <span>User</span>
+              </Link>
+            </li>
           </ul>
         </div>
       </aside>

@@ -2,7 +2,7 @@ import axios from "axios";
 import { useEffect, useState } from "react";
 import Select from "react-select";
 import { Icon } from "@iconify/react";
-import { Modal, Button } from "react-bootstrap";
+import { Modal, Button, OverlayTrigger, Tooltip } from "react-bootstrap";
 import Loader from "../loader/loader";
 import Swal from "sweetalert2";
 
@@ -183,8 +183,39 @@ const KategoriTable = () => {
       });
   };
 
+  const H = "36px";
+  const B = "1px solid #e2e8f0";
+  const R = "8px";
+  const F = "13px";
+
+  const selectStyles = {
+    control: (base) => ({ ...base, minHeight: H, height: H, borderColor: "#e2e8f0", borderRadius: R, fontSize: F, boxShadow: "none", "&:hover": { borderColor: "#a0aec0" } }),
+    valueContainer: (base) => ({ ...base, padding: "0 10px" }),
+    indicatorsContainer: (base) => ({ ...base, height: H }),
+    placeholder: (base) => ({ ...base, color: "#a0aec0", fontSize: F }),
+    singleValue: (base) => ({ ...base, fontSize: F }),
+  };
+
+  const renderTooltip = (text) => (props) => (
+    <Tooltip id="button-tooltip" {...props}>{text}</Tooltip>
+  );
+
   return (
     <>
+      <style>{`
+        .table-row:hover { cursor: pointer; background: #f8fafc !important; }
+        .custom-table th { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; color: #64748b; background: #f8fafc; border-bottom: 2px solid #e2e8f0; padding: 10px 12px; white-space: nowrap; }
+        .custom-table td { font-size: 13px; color: #334155; padding: 10px 12px; border-bottom: 1px solid #f1f5f9; vertical-align: middle; }
+        .act-btn { height: ${H}; width: ${H}; border-radius: ${R}; border: ${B}; display: flex; align-items: center; justify-content: center; cursor: pointer; background: #fff; color: #64748b; }
+        .act-btn:hover { background: #f1f5f9; }
+        .act-btn.blue { background: #dbeafe; border-color: #93c5fd; color: #2563eb; }
+        .act-btn.blue:hover { background: #bfdbfe; }
+        .search-input { height: ${H}; border: ${B}; border-radius: ${R}; padding: 0 12px 0 34px; font-size: ${F}; outline: none; width: 190px; color: #334155; background: #fff; }
+        .search-input:focus { border-color: #3b82f6; box-shadow: 0 0 0 3px rgba(59,130,246,.1); }
+        .search-wrap { position: relative; display: flex; align-items: center; }
+        .search-wrap .s-icon { position: absolute; left: 10px; color: #94a3b8; pointer-events: none; }
+        .fdivider { width: 1px; height: 20px; background: #e2e8f0; flex-shrink: 0; }
+      `}</style>
       {loading && <Loader />}
       <Modal show={showClick} onHide={() => setShowClick(false)}>
         <Modal.Header closeButton>
@@ -243,95 +274,102 @@ const KategoriTable = () => {
       </Modal>
 
       <div className="col-lg-12">
-        <div className="card h-100 body-category">
-          <div className="card-header">
-            <h5 className="card-title mb-0">Category Inventory</h5>
+        <div className="card h-100" style={{ borderRadius: "12px", border: "1px solid #e2e8f0", boxShadow: "0 1px 6px rgba(0,0,0,0.06)" }}>
+          <div className="card-header" style={{ background: "#fff", borderBottom: "1px solid #f1f5f9", borderRadius: "12px 12px 0 0", padding: "14px 18px" }}>
+            <div className="d-flex align-items-center gap-2">
+              <div style={{ width: 3, height: 18, background: "#3b82f6", borderRadius: 3 }} />
+              <h5 className="card-title mb-0" style={{ fontSize: "15px", fontWeight: 600, color: "#1e293b" }}>Category Inventory</h5>
+            </div>
           </div>
-          <div className="card-body">
-            <div className="d-flex justify-content-between mb-3 header-category">
-              <div>
-                <label className="me-3 show-brand">Show</label>
-                <Select
-                  options={[
-                    { value: 10, label: "10" },
-                    { value: 20, label: "20" },
-                    { value: 50, label: "50" },
-                  ]}
-                  onChange={(selectedOption) => {
-                    setPerPage(Number(selectedOption.value));
-                  }}
-                  defaultValue={{ value: perPage, label: `${perPage}` }}
-                  classNamePrefix="select"
-                  className="d-inline-block w-auto"
-                />
+          <div className="card-body" style={{ padding: "14px 18px" }}>
+            <div className="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-3" style={{ background: "#fff", border: "1px solid #e2e8f0", borderRadius: "10px", padding: "10px 14px" }}>
+              <div className="d-flex align-items-center gap-2 flex-wrap">
+                <div className="d-flex align-items-center me-1">
+                  <span className="me-1" style={{ fontSize: "13px", color: "#64748b" }}>Show </span>
+                  <Select
+                    options={[
+                      { value: 10, label: "10" },
+                      { value: 20, label: "20" },
+                      { value: 50, label: "50" },
+                    ]}
+                    onChange={(selectedOption) => setPerPage(Number(selectedOption.value))}
+                    defaultValue={{ value: perPage, label: `${perPage}` }}
+                    classNamePrefix="select"
+                    className="d-inline-block w-auto"
+                    styles={selectStyles}
+                  />
+                </div>
               </div>
 
               <div className="d-flex align-items-center gap-2">
-                <input
-                  type="text"
-                  placeholder="Search..."
-                  className="form-control category-search"
-                  value={search}
-                  onChange={(e) => setSearch(e.target.value)}
-                />
-                <button
-                  onClick={() => {
-                    setMode("add");
-                    setShowClick(true);
-                  }}
-                  className="btn btn-outline-primary w-50 d-flex align-items-center justify-content-center category-button"
-                >
-                  <Icon icon="zondicons:add-outline" fontSize={20} />
-                </button>
+                <div className="search-wrap">
+                  <Icon icon="mdi:magnify" className="s-icon" fontSize={16} />
+                  <input
+                    type="text"
+                    placeholder="Search..."
+                    className="search-input"
+                    value={search}
+                    onChange={(e) => setSearch(e.target.value)}
+                  />
+                </div>
+                <OverlayTrigger placement="top" overlay={renderTooltip("Create Category")}>
+                  <button
+                    onClick={() => { setMode("add"); setShowClick(true); }}
+                    className="act-btn blue"
+                  >
+                    <Icon icon="mdi:plus" fontSize={20} />
+                  </button>
+                </OverlayTrigger>
               </div>
             </div>
 
             <div className="table-responsive">
-              <table className="table basic-border-table mb-0">
+              <table className="table custom-table mb-0">
                 <thead>
                   <tr>
                     <th>No</th>
                     <th>Name</th>
-                    <th>Description</th>
-                    <th id="action">Action</th>
+                    <th className="w-50">Description</th>
+                    <th className="text-center">Action</th>
                   </tr>
                 </thead>
-
                 <tbody>
                   {currentData.length > 0 ? (
                     currentData.map((item, index) => (
-                      <tr key={item.id}>
-                        <td>{indexOfFirstRow + index + 1}</td>
-                        <td>{item.nama}</td>
+                      <tr key={item.id} className="table-row">
+                        <td style={{ color: "#94a3b8" }}>{indexOfFirstRow + index + 1}</td>
+                        <td style={{ fontWeight: 600, color: "#1e293b" }}>{item.nama}</td>
                         <td>{item.keterangan ?? '-'}</td>
-                        <td className="d-flex align-items-center">
-                          <button
-                            className="btn btn-warning btn-sm me-2 d-flex align-items-center"
-                            onClick={() => {
-                              setMode("edit");
-                              setSelectedCategory(item);
-                              setDescription(item.keterangan)
-                              setShowClick(true);
-                            }}
-                          >
-                            <Icon icon="mdi:pencil" width={18} />
-                          </button>
-                          <button
-                            className="btn btn-danger btn-sm d-flex align-items-center"
-                            onClick={() => handleDelete(item.id)}
-                          >
-                            <Icon
-                              icon="material-symbols:delete-outline"
-                              width={18}
-                            />
-                          </button>
+                        <td>
+                          <div className="d-flex align-items-center justify-content-center gap-1">
+                            <button
+                              className="btn btn-warning btn-sm d-flex align-items-center"
+                              style={{ borderRadius: 7 }}
+                              onClick={() => {
+                                setMode("edit");
+                                setSelectedCategory(item);
+                                setDescription(item.keterangan)
+                                setShowClick(true);
+                              }}
+                            >
+                              <Icon icon="mdi:pencil" width={15} />
+                            </button>
+                            <button
+                              className="btn btn-danger btn-sm d-flex align-items-center"
+                              style={{ borderRadius: 7 }}
+                              onClick={() => handleDelete(item.id)}
+                            >
+                              <Icon icon="material-symbols:delete-outline" width={15} />
+                            </button>
+                          </div>
                         </td>
                       </tr>
                     ))
                   ) : (
                     <tr>
-                      <td colSpan="11" className="text-center">
-                        No data found
+                      <td colSpan="4" className="text-center py-5" style={{ color: "#94a3b8", fontSize: 14 }}>
+                        <Icon icon="mdi:inbox-outline" fontSize={32} style={{ display: "block", margin: "0 auto 8px" }} />
+                        {loading ? "Loading..." : "No data found"}
                       </td>
                     </tr>
                   )}
@@ -340,51 +378,34 @@ const KategoriTable = () => {
             </div>
 
             {/* Pagination */}
-            <div className="d-flex justify-content-between align-items-center mt-3 pagination-section">
-              <span>
-                Showing {indexOfFirstRow + 1} to {indexLastRow} of{" "}
-                {totalPages * perPage} entries
+            <div className="d-flex justify-content-between align-items-center mt-3">
+              <span style={{ fontSize: 13, color: "#64748b" }}>
+                Showing {indexOfFirstRow + 1} to {Math.min(indexLastRow, totalPages * perPage)} of {totalPages * perPage} entries
               </span>
-
               <nav>
-                <ul className="pagination mb-0">
+                <ul className="pagination mb-0" style={{ gap: 4 }}>
                   <li className={`page-item ${page === 1 ? "disabled" : ""}`}>
-                    <button
-                      className="page-link"
-                      onClick={() => setPage(page - 1)}
-                    >
-                      Previous
+                    <button className="page-link" style={{ borderRadius: 8, fontSize: 13 }} onClick={() => setPage(page - 1)}>
+                      ‹ Prev
                     </button>
                   </li>
-
                   {getPageNumbers(page, totalPages).map((pageNumber, index) => (
                     <li
                       key={index}
-                      className={`page-item ${
-                        pageNumber === page ? "active" : ""
-                      } ${pageNumber === "..." ? "disabled" : ""}`}
+                      className={`page-item ${pageNumber === page ? "active" : ""} ${pageNumber === "..." ? "disabled" : ""}`}
                     >
                       <button
                         className="page-link"
-                        onClick={() =>
-                          pageNumber !== "..." ? setPage(pageNumber) : null
-                        }
+                        style={{ borderRadius: 8, fontSize: 13 }}
+                        onClick={() => pageNumber !== "..." ? setPage(pageNumber) : null}
                       >
                         {pageNumber}
                       </button>
                     </li>
                   ))}
-
-                  <li
-                    className={`page-item ${
-                      page === totalPages ? "disabled" : ""
-                    }`}
-                  >
-                    <button
-                      className="page-link"
-                      onClick={() => setPage(page + 1)}
-                    >
-                      Next
+                  <li className={`page-item ${page === totalPages ? "disabled" : ""}`}>
+                    <button className="page-link" style={{ borderRadius: 8, fontSize: 13 }} onClick={() => setPage(page + 1)}>
+                      Next ›
                     </button>
                   </li>
                 </ul>

@@ -43,13 +43,18 @@ export default function InteractionLogTable({ logs, onEdit, onRefresh }) {
   };
 
   if (!logs.length) {
-    return <p className="text-muted text-center py-4">Belum ada interaction log.</p>;
+    return (
+      <div className="text-center py-5">
+        <Icon icon="mdi:inbox-outline" fontSize={32} style={{ display: "block", margin: "0 auto 8px", color: "#94a3b8" }} />
+        <span style={{ color: "#94a3b8", fontSize: 14 }}>Belum ada interaction log.</span>
+      </div>
+    );
   }
 
   return (
     <div className="table-responsive">
-      <table className="table table-striped table-hover align-middle">
-        <thead className="table-light">
+      <table className="table user-table mb-0">
+        <thead>
           <tr>
             <th>Outlet</th>
             <th>Salesman</th>
@@ -58,13 +63,13 @@ export default function InteractionLogTable({ logs, onEdit, onRefresh }) {
             <th>Follow-up</th>
             <th>Status</th>
             <th>Tanggal</th>
-            <th>Aksi</th>
+            <th className="text-center">Aksi</th>
           </tr>
         </thead>
         <tbody>
           {logs.map((log) => (
-            <tr key={log.id}>
-              <td className="fw-semibold">{log.customer_name}</td>
+            <tr key={log.id} className="table-row">
+              <td className="fw-semibold text-dark">{log.customer_name}</td>
               <td>{log.salesman_name}</td>
               <td style={{ maxWidth: 220 }}>
                 <span
@@ -94,20 +99,24 @@ export default function InteractionLogTable({ logs, onEdit, onRefresh }) {
               </td>
               <td className="text-muted small">{log.created_at?.slice(0, 10)}</td>
               <td>
-                <button
-                  className="btn btn-sm btn-outline-primary me-1"
-                  onClick={() => onEdit(log)}
-                  title="Edit"
-                >
-                  <Icon icon="lucide:pencil" />
-                </button>
-                <button
-                  className="btn btn-sm btn-outline-danger"
-                  onClick={() => handleDelete(log.id)}
-                  title="Hapus"
-                >
-                  <Icon icon="lucide:trash-2" />
-                </button>
+                <div className="d-flex gap-2 align-items-center justify-content-center">
+                  <button
+                    className="btn btn-warning btn-sm d-flex align-items-center justify-content-center"
+                    style={{ borderRadius: "7px", width: "28px", height: "28px", padding: 0 }}
+                    onClick={() => onEdit(log)}
+                    title="Edit"
+                  >
+                    <Icon icon="mdi:pencil" width={16} />
+                  </button>
+                  <button
+                    className="btn btn-danger btn-sm d-flex align-items-center justify-content-center"
+                    style={{ borderRadius: "7px", width: "28px", height: "28px", padding: 0 }}
+                    onClick={() => handleDelete(log.id)}
+                    title="Hapus"
+                  >
+                    <Icon icon="mdi:trash" width={16} />
+                  </button>
+                </div>
               </td>
             </tr>
           ))}

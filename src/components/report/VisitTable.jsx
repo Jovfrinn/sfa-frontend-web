@@ -267,6 +267,19 @@ const VisitTable = () => {
   const indexLastRow = page * perPage;
   const indexOfFirstRow = indexLastRow - perPage;
 
+  const H = "36px";
+  const B = "1px solid #e2e8f0";
+  const R = "8px";
+  const F = "13px";
+
+  const selectStyles = {
+    control: (base) => ({ ...base, minHeight: H, height: H, borderColor: "#e2e8f0", borderRadius: R, fontSize: F, boxShadow: "none", "&:hover": { borderColor: "#a0aec0" } }),
+    valueContainer: (base) => ({ ...base, padding: "0 10px" }),
+    indicatorsContainer: (base) => ({ ...base, height: H }),
+    placeholder: (base) => ({ ...base, color: "#a0aec0", fontSize: F }),
+    singleValue: (base) => ({ ...base, fontSize: F }),
+  };
+
   function getCompactLinks(links, currentPage) {
     if (!links) return [];
     const numbered = links.filter((l) => !isNaN(Number(l.label)));
@@ -311,48 +324,85 @@ const VisitTable = () => {
 
   return (
     <>
+      <style>{`
+        .table-row:hover { cursor: pointer; background: #f8fafc !important; }
+        .user-table th { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; color: #64748b; background: #f8fafc; border-bottom: 2px solid #e2e8f0; padding: 10px 12px; white-space: nowrap; }
+        .user-table td { font-size: 13px; color: #334155; padding: 10px 12px; border-bottom: 1px solid #f1f5f9; vertical-align: middle; white-space: nowrap; }
+        .act-btn { height: ${H}; width: ${H}; border-radius: ${R}; border: ${B}; display: flex; align-items: center; justify-content: center; cursor: pointer; background: #fff; color: #64748b; }
+        .act-btn:hover { background: #f1f5f9; }
+        .act-btn.blue { background: #dbeafe; border-color: #93c5fd; color: #2563eb; }
+        .act-btn.blue:hover { background: #bfdbfe; }
+        .act-btn.green { background: #dcfce7; border-color: #86efac; color: #16a34a; }
+        .act-btn.green:hover { background: #bbf7d0; }
+        .search-input { height: ${H}; border: ${B}; border-radius: ${R}; padding: 0 12px 0 34px; font-size: ${F}; outline: none; width: 190px; color: #334155; background: #fff; }
+        .search-input:focus { border-color: #3b82f6; box-shadow: 0 0 0 3px rgba(59,130,246,.1); }
+        .search-wrap { position: relative; display: flex; align-items: center; }
+        .search-wrap .s-icon { position: absolute; left: 10px; color: #94a3b8; pointer-events: none; }
+        .fdivider { width: 1px; height: 20px; background: #e2e8f0; flex-shrink: 0; }
+      `}</style>
+      
       {isLoading && <Loader />}
-      <div className="col-lg-12 body-visit">
-        <div className="card">
-          <div className="card-header d-flex justify-content-between align-items-center">
-            <h5 className="card-title mb-0 filter-title">Filter & Export</h5>
-            <div className="d-flex gap-1">
-              {showFilter && (
-                <OverlayTrigger
-                  placement="top"
-                  overlay={renderTooltip("Export Data")}
-                >
-                  <button
-                    onClick={() => handleExport()}
-                    className="btn btn-success btn-sm"
-                  >
-                    <Icon icon={"mdi:file-export-outline"} fontSize={24} />
-                  </button>
-                </OverlayTrigger>
-              )}
-              <OverlayTrigger
-                placement="top"
-                overlay={renderTooltip("Filter")}
-              >
-                <button
-                  onClick={() => setShowFilter(!showFilter)}
-                  className="btn btn-outline-secondary btn-sm d-flex align-items-center gap-2 filter-button"
-                  data-bs-toggle="tooltip"
-                  data-bs-placement="top"
-                  data-bs-title="Tooltip on top"
-                >
-                  <Icon icon={"mdi:filter-outline"} className="icon" fontSize={24} />
-                </button>
-              </OverlayTrigger>
+      
+      <div className="col-lg-12">
+        <div className="card h-100" style={{ borderRadius: "12px", border: "1px solid #e2e8f0", boxShadow: "0 1px 6px rgba(0,0,0,0.06)" }}>
+          <div className="card-header d-flex justify-content-between align-items-center" style={{ background: "#fff", borderBottom: "1px solid #f1f5f9", borderRadius: "12px 12px 0 0", padding: "14px 18px" }}>
+            <div className="d-flex align-items-center gap-2">
+              <div style={{ width: 3, height: 18, background: "#3b82f6", borderRadius: 3 }} />
+              <h5 className="card-title mb-0" style={{ fontSize: "15px", fontWeight: 600, color: "#1e293b" }}>Report Visit</h5>
             </div>
           </div>
-          {showFilter && (
-            <div className="card-body">
-              <div className="row g-3">
-                <div className={isManager ? "col-md-6" : "col-md-4"}>
-                  <label htmlFor="company-select" className="form-label">
-                    Company
-                  </label>
+
+          <div className="card-body" style={{ padding: "14px 18px" }}>
+            <div className="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-3" style={{ background: "#fff", border: "1px solid #e2e8f0", borderRadius: "10px", padding: "10px 14px" }}>
+              <div className="d-flex align-items-center gap-2 flex-wrap">
+                <div className="d-flex align-items-center">
+                  <span className="me-2" style={{ fontSize: "13px", color: "#64748b" }}>Show</span>
+                  <Select
+                    options={show}
+                    onChange={(e) => handleChangeShow(e)}
+                    value={{ value: perPage, label: `${perPage}` }}
+                    classNamePrefix="select"
+                    className="d-inline-block w-auto"
+                    styles={selectStyles}
+                  />
+                </div>
+              </div>
+
+              <div className="d-flex align-items-center gap-2">
+                <div className="search-wrap">
+                  <Icon icon="mdi:magnify" className="s-icon" fontSize={16} />
+                  <input
+                    type="text"
+                    placeholder="Search..."
+                    className="search-input"
+                    value={search}
+                    onChange={(e) => setSearch(e.target.value)}
+                  />
+                </div>
+                
+                {showFilter && (
+                  <button
+                    className="act-btn green"
+                    title="Export"
+                    onClick={() => handleExport()}
+                  >
+                    <Icon icon="mdi:file-export-outline" fontSize={18} />
+                  </button>
+                )}
+                
+                <button
+                  className={`act-btn ${showFilter ? 'blue' : ''}`}
+                  onClick={() => setShowFilter(!showFilter)}
+                  title="Filter"
+                >
+                  <Icon icon="line-md:filter" fontSize={18}/>
+                </button>
+              </div>
+            </div>
+
+            {showFilter && (
+              <div className="row g-2 mb-3" style={{ background: "#f8fafc", padding: "12px", borderRadius: "8px", border: "1px solid #e2e8f0" }}>
+                <div className={isManager ? "col-md-6 col-lg-4" : "col-md-4 col-lg-3"}>
                   <Select
                     id="company-select"
                     options={company}
@@ -369,16 +419,14 @@ const VisitTable = () => {
                       setSelectedSalesman(null);
                     }}
                     value={selectedCompany}
-                    placeholder="Choose Company"
+                    placeholder="Company"
+                    styles={selectStyles}
                     isClearable
                   />
                 </div>
 
                 {!isManager && (
-                  <div className="col-md-4">
-                    <label htmlFor="role-select" className="form-label">
-                      Role
-                    </label>
+                  <div className="col-md-4 col-lg-3">
                     <Select
                       id="role-select"
                       options={roles}
@@ -387,16 +435,14 @@ const VisitTable = () => {
                         setSelectedRole(e);
                         setSelectedSalesman(null);
                       }}
-                      placeholder="Choose Role"
+                      placeholder="Role"
+                      styles={selectStyles}
                       isClearable
                     />
                   </div>
                 )}
 
-                <div className={isManager ? "col-md-6" : "col-md-4"}>
-                  <label htmlFor="salesman-select" className="form-label">
-                    Salesman
-                  </label>
+                <div className={isManager ? "col-md-6 col-lg-4" : "col-md-4 col-lg-2"}>
                   <AsyncSelect
                     key={`${selectedCompany?.value}-${selectedRole?.value}`}
                     cacheOptions
@@ -404,65 +450,41 @@ const VisitTable = () => {
                     loadOptions={loadSalesmanOptions}
                     value={selectedSalesman}
                     onChange={setSelectedSalesman}
-                    placeholder="Choose Salesman"
+                    placeholder="Salesman"
+                    styles={selectStyles}
                     isClearable
                     id="salesman-select"
                   />
                 </div>
 
-                <div className="col-md-6">
-                  <label htmlFor="date-from-input" className="form-label">
-                    From
-                  </label>
+                <div className={isManager ? "col-md-6 col-lg-2" : "col-md-4 col-lg-2"}>
                   <input
                     type="date"
                     defaultValue={selectedFromDate}
                     onChange={(e) => setSelectedFromDate(e.target.value)}
                     id="date-from-input"
                     className="form-control"
+                    style={{ height: H, borderColor: "#e2e8f0", borderRadius: R, fontSize: F }}
+                    title="From Date"
                   />
                 </div>
 
-                <div className="col-md-6">
-                  <label htmlFor="date-to-input" className="form-label">
-                    To
-                  </label>
+                <div className={isManager ? "col-md-6 col-lg-2" : "col-md-4 col-lg-2"}>
                   <input
                     type="date"
                     id="date-to-input"
                     className="form-control"
                     onChange={(e) => setSelectedToDate(e.target.value)}
                     defaultValue={selectedToDate}
+                    style={{ height: H, borderColor: "#e2e8f0", borderRadius: R, fontSize: F }}
+                    title="To Date"
                   />
                 </div>
               </div>
-            </div>
-          )}
-        </div>
+            )}
 
-        <div className="card h-100 mt-3">
-          <div className="card-header d-flex justify-content-between align-items-center report-visit-section">
-            <h5 className="card-title mb-0 report-visit">Report Visit</h5>
-            <div className="d-flex align-items-center gap-3">
-              <div className="d-flex align-items-center navbar-search">
-                <input type="text" name="search" placeholder="Search" />
-                <Icon icon="ion:search-outline" className="icon" />
-              </div>
-              <div className="d-flex align-items-center">
-                <Select
-                  options={show}
-                  onChange={(e) => handleChangeShow(e)}
-                  defaultValue={show[0]}
-                  classNamePrefix="select-show"
-                />
-                <span className="ms-1 show-text">Show</span>
-              </div>
-            </div>
-          </div>
-
-          <div className="card-body">
             <div className="table-responsive">
-              <table className="table basic-border-table mb-0">
+              <table className="table user-table mb-0">
                 <thead>
                   <tr>
                     <th>No</th>
@@ -481,20 +503,24 @@ const VisitTable = () => {
                     <th>Result POSM</th>
                     <th>Photo POSM</th>
                     <th>Result</th>
-                    <th>Aksi</th>
+                    <th className="text-center">Aksi</th>
                   </tr>
                 </thead>
                 <tbody>
                   {currentData.length > 0 ? (
                     currentData.map((v, i) => (
-                      <tr key={i}>
-                        <td>{(page - 1) * perPage + (i + 1)}</td>
-                        <td>{v.user.full_name}</td>
-                        <td>{v.user.role ? v.user.role.name : "-"}</td>
-                        <td>{v.user.company.name}</td>
-                        <td>{v.master_customer.name}</td>
-                        <td>{getStatusBadge(v.master_customer.status)}</td>
-                        <td>{v.master_customer.alamat}</td>
+                      <tr key={i} className="table-row">
+                        <td style={{ color: "#94a3b8" }}>{(page - 1) * perPage + (i + 1)}</td>
+                        <td style={{ fontWeight: 600, color: "#1e293b" }}>{v.user?.full_name ?? "-"}</td>
+                        <td>{v.user?.role?.name ?? "-"}</td>
+                        <td>{v.user?.company?.name ?? "-"}</td>
+                        <td>{v.master_customer?.name ?? "-"}</td>
+                        <td>{getStatusBadge(v.master_customer?.status)}</td>
+                        <td>
+                          <span className="text-truncate d-block" style={{ maxWidth: 250 }} title={v.master_customer?.alamat}>
+                            {v.master_customer?.alamat ?? "-"}
+                          </span>
+                        </td>
                         <td>{v.tap_in_time}</td>
                         <td>{v.tap_out_time}</td>
                         <td>
@@ -502,7 +528,7 @@ const VisitTable = () => {
                             href={`https://www.google.com/maps?q=${v.latitude},${v.longitude}`}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="text-primary"
+                            className="text-primary text-decoration-none"
                           >
                             See Location
                           </a>
@@ -512,7 +538,7 @@ const VisitTable = () => {
                             href={`${VITE_STORAGE_URI}/storage/${v.photo_path}`}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="text-primary"
+                            className="text-primary text-decoration-none"
                           >
                             See Photo
                           </a>
@@ -526,28 +552,32 @@ const VisitTable = () => {
                               href={`${VITE_STORAGE_URI}/storage/${v.posm_relation?.photo_path}`}
                               target="_blank"
                               rel="noopener noreferrer"
-                              className="text-primary"
+                              className="text-primary text-decoration-none"
                             >
                               See Photo POSM
                             </a>
                           ) : (
-                            "-"
+                            <span className="text-muted">-</span>
                           )}
                         </td>
                         <td>{v.result ?? "-"}</td>
                         <td>
-                          <button
-                            className="btn btn-sm btn-outline-primary"
-                            onClick={() => setSelectedTapInId(v.id)}
-                          >
-                            Detail
-                          </button>
+                          <div className="d-flex gap-2 align-items-center justify-content-center">
+                            <button
+                              className="btn btn-primary btn-sm d-flex align-items-center justify-content-center"
+                              style={{ borderRadius: "7px", width: "28px", height: "28px", padding: 0 }}
+                              onClick={() => setSelectedTapInId(v.id)}
+                              title="Detail"
+                            >
+                              <Icon icon="lucide:eye" width={16} />
+                            </button>
+                          </div>
                         </td>
                       </tr>
                     ))
                   ) : (
                     <tr>
-                      <td colSpan="16" className="text-center text-muted py-3">
+                      <td colSpan="17" className="text-center py-5" style={{ color: "#94a3b8", fontSize: 14 }}>
                         Data tidak ditemukan
                       </td>
                     </tr>
@@ -556,36 +586,43 @@ const VisitTable = () => {
               </table>
             </div>
 
-            <div className="d-flex justify-content-between align-items-center mt-3 section-pagination">
-              <span>
-                Showing {indexOfFirstRow + 1} to {indexLastRow} of {total} entries
+            <div className="d-flex justify-content-between align-items-center mt-3">
+              <span style={{ fontSize: 13, color: "#64748b" }}>
+                Showing {indexOfFirstRow + 1} to {Math.min(indexLastRow, total)} of {total} entries
               </span>
-              <nav aria-label="Page navigation">
-                <ul className="pagination justify-content-center mt-3">
+              <nav>
+                <ul className="pagination mb-0" style={{ gap: 4 }}>
                   {links && links.length > 0 ? (
-                    getCompactLinks(links, page).map((link, index) => (
-                      <li
-                        key={index}
-                        className={`page-item ${link.active ? "active" : ""} ${!link.url ? "disabled" : ""}`}
-                      >
-                        {link.url ? (
-                          <button
-                            type="button"
-                            className="page-link"
-                            onClick={() => handlePageChange(link.url)}
-                            dangerouslySetInnerHTML={{ __html: link.label }}
-                          />
-                        ) : (
-                          <span
-                            className="page-link"
-                            dangerouslySetInnerHTML={{ __html: link.label }}
-                          />
-                        )}
-                      </li>
-                    ))
+                    getCompactLinks(links, page).map((link, index) => {
+                      const isPrev = link.label.includes("Previous");
+                      const isNext = link.label.includes("Next");
+                      const label = isPrev ? "‹ Prev" : isNext ? "Next ›" : link.label;
+                      return (
+                        <li
+                          key={index}
+                          className={`page-item ${link.active ? "active" : ""} ${!link.url ? "disabled" : ""}`}
+                        >
+                          {link.url ? (
+                            <button
+                              type="button"
+                              className="page-link"
+                              style={{ borderRadius: 8, fontSize: 13 }}
+                              onClick={() => handlePageChange(link.url)}
+                              dangerouslySetInnerHTML={{ __html: label }}
+                            />
+                          ) : (
+                            <span
+                              className="page-link"
+                              style={{ borderRadius: 8, fontSize: 13 }}
+                              dangerouslySetInnerHTML={{ __html: label }}
+                            />
+                          )}
+                        </li>
+                      );
+                    })
                   ) : (
                     <li className="page-item disabled">
-                      <span className="page-link">No pages</span>
+                      <span className="page-link" style={{ borderRadius: 8, fontSize: 13 }}>No pages</span>
                     </li>
                   )}
                 </ul>

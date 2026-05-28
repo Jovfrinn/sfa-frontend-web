@@ -9,6 +9,8 @@ import Swal from "sweetalert2";
 import Loader from "../loader/loader";
 import { Tooltip, OverlayTrigger } from "react-bootstrap";
 import ExcelUploadModal from "./ExcelUploadModal";
+// import { Icon } from "@iconify/react";
+
 
 const CustomerTable = ({ status }) => {
   const navigate = useNavigate();

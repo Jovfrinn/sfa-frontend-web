@@ -80,8 +80,16 @@ const JourneyPlanTable = () => {
 
   const [showTargetModal, setShowTargetModal] = useState(false);
   const [showDetailModal, setShowDetailModal] = useState(false);
+  const [showAddModal, setShowAddModal] = useState(false);
   const [selectedItem, setSelectedItem] = useState(null);
   const [targetDaily, setTargetDaily] = useState(8);
+
+  const [addForm, setAddForm] = useState({
+    users_id: null,
+    master_customer_id: null,
+    planned_visit_date: "",
+    status: "pending",
+  });
 
   const statusOptions = [
     { value: "pending", label: "Pending" },
@@ -183,6 +191,20 @@ const JourneyPlanTable = () => {
       return response.data.data || [];
     } catch (error) {
       console.error("Error loading companies:", error);
+      return [];
+    }
+  };
+
+  const loadCustomerOptions = async (inputValue) => {
+    try {
+      const response = await axios.get(`${api}/journey-plan/customers`, {
+        headers: { Authorization: `Bearer ${token}` },
+        params: { search: inputValue },
+      });
+
+      return response.data.data || [];
+    } catch (error) {
+      console.error("Error loading customers:", error);
       return [];
     }
   };
@@ -334,6 +356,59 @@ const JourneyPlanTable = () => {
     }
   };
 
+  // Add Journey Plan Submit
+  const handleAddSubmit = async () => {
+    try {
+      if (!addForm.users_id || !addForm.master_customer_id || !addForm.planned_visit_date) {
+        Swal.fire({
+          icon: "warning",
+          title: "Data tidak lengkap",
+          text: "Silakan isi semua field yang wajib (Salesman, Outlet, Tanggal Rencana)",
+        });
+        return;
+      }
+
+      setIsLoading(true);
+      const payload = {
+        users_id: addForm.users_id.value,
+        master_customer_id: addForm.master_customer_id.value,
+        planned_visit_date: addForm.planned_visit_date,
+        status: addForm.status,
+      };
+
+      await axios.post(`${api}/journey-plan/store`, payload, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+
+      Swal.fire({
+        icon: "success",
+        title: "Berhasil!",
+        text: "Journey plan berhasil dibuat",
+        timer: 2000,
+        showConfirmButton: false,
+      });
+
+      setShowAddModal(false);
+      setAddForm({
+        users_id: null,
+        master_customer_id: null,
+        planned_visit_date: "",
+        status: "pending",
+      });
+      fetchJourneyPlans();
+      fetchStats();
+    } catch (error) {
+      console.error("Error creating journey plan:", error);
+      Swal.fire({
+        icon: "error",
+        title: "Gagal",
+        text: error.response?.data?.message || "Gagal membuat journey plan",
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   // View detail
   const viewDetail = (item) => {
     setSelectedItem(item);
@@ -421,16 +496,16 @@ const JourneyPlanTable = () => {
 
   // ==================== Selection Functions ====================
 
-  // Get all pending items on current page
-  const getPendingItems = () => {
-    return data.filter((item) => item.status === "pending");
+  // Get all items on current page
+  const getSelectableItems = () => {
+    return data;
   };
 
   // Handle select all checkbox
   const handleSelectAll = (e) => {
     if (e.target.checked) {
-      const pendingIds = getPendingItems().map((item) => item.id);
-      setSelectedIds(pendingIds);
+      const allIds = getSelectableItems().map((item) => item.id);
+      setSelectedIds(allIds);
     } else {
       setSelectedIds([]);
     }
@@ -447,22 +522,22 @@ const JourneyPlanTable = () => {
     });
   };
 
-  // Check if all pending items are selected
+  // Check if all items are selected
   const isAllSelected = () => {
-    const pendingItems = getPendingItems();
+    const items = getSelectableItems();
     return (
-      pendingItems.length > 0 &&
-      pendingItems.every((item) => selectedIds.includes(item.id))
+      items.length > 0 &&
+      items.every((item) => selectedIds.includes(item.id))
     );
   };
 
-  // Check if some (but not all) pending items are selected
+  // Check if some (but not all) items are selected
   const isSomeSelected = () => {
-    const pendingItems = getPendingItems();
+    const items = getSelectableItems();
     return (
       selectedIds.length > 0 &&
       !isAllSelected() &&
-      pendingItems.some((item) => selectedIds.includes(item.id))
+      items.some((item) => selectedIds.includes(item.id))
     );
   };
 
@@ -555,75 +630,95 @@ const JourneyPlanTable = () => {
 
   return (
     <MasterLayout>
+      <style>{`
+        .stat-card {
+          transition: all 0.3s ease;
+        }
+        .stat-card:hover {
+          transform: translateY(-4px);
+          box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+      `}</style>
       <div className="min-vh-100 p-4">
         <div className="container-fluid" style={{ maxWidth: "1400px" }}>
           {/* Stats Cards */}
           <div className="row g-3 mb-4">
+            {/* Card 1: Daily Target */}
             <div className="col-12 col-md-6 col-lg-3">
-              <div className="card border-0 shadow-sm">
+              <div className="card h-100" style={{ borderRadius: "12px", border: "1px solid #e2e8f0", boxShadow: "0 2px 8px rgba(0,0,0,0.04)", overflow: "hidden" }}>
                 <div
-                  className="card-body"
-                  style={{ cursor: "pointer" }}
+                  className="card-body position-relative stat-card"
+                  style={{ padding: "20px", cursor: "pointer", background: "#fff" }}
                   onClick={() => setShowTargetModal(true)}
                 >
-                  <div className="d-flex justify-content-between align-items-center">
-                    <div>
-                      <p className="text-muted small mb-1">Daily Target</p>
-                      <h2 className="fw-bold mb-0 fs-1">{targetDaily}</h2>
-                      <small className="text-muted">
-                        Target kunjungan per hari
-                      </small>
+                  <div className="d-flex justify-content-between align-items-center mb-3">
+                    <p className="mb-0 text-uppercase" style={{ fontSize: "12px", fontWeight: 700, letterSpacing: "0.5px", color: "#64748b" }}>Daily Target</p>
+                    <div style={{ width: 44, height: 44, borderRadius: "12px", background: "#f1f5f9", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                      <Clock color="#64748b" size={22} />
                     </div>
-                    <Clock className="text-secondary" size={32} />
                   </div>
+                  <div>
+                    <h2 className="fw-bold mb-1" style={{ fontSize: "32px", color: "#1e293b", letterSpacing: "-1px" }}>{targetDaily}</h2>
+                    <p className="mb-0" style={{ fontSize: "13px", color: "#94a3b8" }}>Target kunjungan harian</p>
+                  </div>
+                  <div style={{ position: "absolute", bottom: 0, left: 0, width: "100%", height: "4px", background: "#94a3b8" }}></div>
                 </div>
               </div>
             </div>
 
+            {/* Card 2: Pending */}
             <div className="col-12 col-md-6 col-lg-3">
-              <div className="card border-0 shadow-sm">
-                <div className="card-body">
-                  <div className="d-flex justify-content-between align-items-center">
-                    <div>
-                      <p className="text-muted small mb-1">Pending</p>
-                      <h2 className="fw-bold text-warning mb-0">
-                        {stats.pending}
-                      </h2>
+              <div className="card h-100" style={{ borderRadius: "12px", border: "1px solid #e2e8f0", boxShadow: "0 2px 8px rgba(0,0,0,0.04)", overflow: "hidden" }}>
+                <div className="card-body position-relative stat-card" style={{ padding: "20px", background: "#fff" }}>
+                  <div className="d-flex justify-content-between align-items-center mb-3">
+                    <p className="mb-0 text-uppercase" style={{ fontSize: "12px", fontWeight: 700, letterSpacing: "0.5px", color: "#64748b" }}>Pending</p>
+                    <div style={{ width: 44, height: 44, borderRadius: "12px", background: "#fef3c7", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                      <Clock color="#d97706" size={22} />
                     </div>
-                    <Clock className="text-warning" size={32} />
                   </div>
+                  <div>
+                    <h2 className="fw-bold mb-1" style={{ fontSize: "32px", color: "#1e293b", letterSpacing: "-1px" }}>{stats.pending}</h2>
+                    <p className="mb-0" style={{ fontSize: "13px", color: "#94a3b8" }}>Menunggu persetujuan</p>
+                  </div>
+                  <div style={{ position: "absolute", bottom: 0, left: 0, width: "100%", height: "4px", background: "#f59e0b" }}></div>
                 </div>
               </div>
             </div>
 
+            {/* Card 3: Approved */}
             <div className="col-12 col-md-6 col-lg-3">
-              <div className="card border-0 shadow-sm">
-                <div className="card-body">
-                  <div className="d-flex justify-content-between align-items-center">
-                    <div>
-                      <p className="text-muted small mb-1">Approved</p>
-                      <h2 className="fw-bold text-info mb-0">
-                        {stats.approved}
-                      </h2>
+              <div className="card h-100" style={{ borderRadius: "12px", border: "1px solid #e2e8f0", boxShadow: "0 2px 8px rgba(0,0,0,0.04)", overflow: "hidden" }}>
+                <div className="card-body position-relative stat-card" style={{ padding: "20px", background: "#fff" }}>
+                  <div className="d-flex justify-content-between align-items-center mb-3">
+                    <p className="mb-0 text-uppercase" style={{ fontSize: "12px", fontWeight: 700, letterSpacing: "0.5px", color: "#64748b" }}>Approved</p>
+                    <div style={{ width: 44, height: 44, borderRadius: "12px", background: "#dbeafe", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                      <CheckCircle color="#2563eb" size={22} />
                     </div>
-                    <CheckCircle className="text-info" size={32} />
                   </div>
+                  <div>
+                    <h2 className="fw-bold mb-1" style={{ fontSize: "32px", color: "#1e293b", letterSpacing: "-1px" }}>{stats.approved}</h2>
+                    <p className="mb-0" style={{ fontSize: "13px", color: "#94a3b8" }}>Journey telah disetujui</p>
+                  </div>
+                  <div style={{ position: "absolute", bottom: 0, left: 0, width: "100%", height: "4px", background: "#3b82f6" }}></div>
                 </div>
               </div>
             </div>
 
+            {/* Card 4: Completed */}
             <div className="col-12 col-md-6 col-lg-3">
-              <div className="card border-0 shadow-sm">
-                <div className="card-body">
-                  <div className="d-flex justify-content-between align-items-center">
-                    <div>
-                      <p className="text-muted small mb-1">Completed</p>
-                      <h2 className="fw-bold text-success mb-0">
-                        {stats.completed}
-                      </h2>
+              <div className="card h-100" style={{ borderRadius: "12px", border: "1px solid #e2e8f0", boxShadow: "0 2px 8px rgba(0,0,0,0.04)", overflow: "hidden" }}>
+                <div className="card-body position-relative stat-card" style={{ padding: "20px", background: "#fff" }}>
+                  <div className="d-flex justify-content-between align-items-center mb-3">
+                    <p className="mb-0 text-uppercase" style={{ fontSize: "12px", fontWeight: 700, letterSpacing: "0.5px", color: "#64748b" }}>Completed</p>
+                    <div style={{ width: 44, height: 44, borderRadius: "12px", background: "#dcfce7", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                      <TrendingUp color="#16a34a" size={22} />
                     </div>
-                    <TrendingUp className="text-success" size={32} />
                   </div>
+                  <div>
+                    <h2 className="fw-bold mb-1" style={{ fontSize: "32px", color: "#1e293b", letterSpacing: "-1px" }}>{stats.completed}</h2>
+                    <p className="mb-0" style={{ fontSize: "13px", color: "#94a3b8" }}>Kunjungan selesai</p>
+                  </div>
+                  <div style={{ position: "absolute", bottom: 0, left: 0, width: "100%", height: "4px", background: "#22c55e" }}></div>
                 </div>
               </div>
             </div>
@@ -655,7 +750,7 @@ const JourneyPlanTable = () => {
                   >
                     <Filter size={18} />
                   </button>
-                  <button className="btn btn-outline-primary btn-sm px-3">
+                  <button className="btn btn-outline-primary btn-sm px-3" onClick={() => setShowAddModal(true)}>
                     <Icon icon="zondicons:add-outline" fontSize={20} />
                   </button>
                 </div>
@@ -818,13 +913,13 @@ const JourneyPlanTable = () => {
                                   }
                                 }}
                                 onChange={handleSelectAll}
-                                disabled={getPendingItems().length === 0}
+                                disabled={getSelectableItems().length === 0}
                                 className="form-check-input m-0"
                                 style={{
                                   width: "20px",
                                   height: "20px",
                                   cursor:
-                                    getPendingItems().length === 0
+                                    getSelectableItems().length === 0
                                       ? "not-allowed"
                                       : "pointer",
                                 }}
@@ -866,7 +961,6 @@ const JourneyPlanTable = () => {
                                 verticalAlign: "middle",
                               }}
                             >
-                              {item.status === "pending" ? (
                                 <div
                                   style={{
                                     display: "flex",
@@ -886,18 +980,6 @@ const JourneyPlanTable = () => {
                                     }}
                                   />
                                 </div>
-                              ) : (
-                                <span
-                                  style={{
-                                    display: "inline-block",
-                                    width: "20px",
-                                    height: "20px",
-                                    borderRadius: "4px",
-                                    backgroundColor: "#e9ecef",
-                                    border: "2px solid #dee2e6",
-                                  }}
-                                ></span>
-                              )}
                             </td>
                             <td>{item.user?.company?.name || "-"}</td>
                             <td>{item.user?.full_name || "-"}</td>
@@ -1223,6 +1305,88 @@ const JourneyPlanTable = () => {
               <div className="modal-backdrop show"></div>
             </>
           )}
+
+          {/* Add Modal */}
+          {showAddModal && (
+            <>
+              <div className="modal show d-block" tabIndex="-1">
+                <div className="modal-dialog modal-dialog-centered">
+                  <div className="modal-content">
+                    <div className="modal-header">
+                      <h5 className="modal-title">Tambah Journey Plan</h5>
+                      <button
+                        type="button"
+                        className="btn-close"
+                        onClick={() => setShowAddModal(false)}
+                      ></button>
+                    </div>
+                    <div className="modal-body">
+                      <div className="row g-3">
+                        <div className="col-12">
+                          <label className="form-label small">Salesman <span className="text-danger">*</span></label>
+                          <AsyncSelect
+                            cacheOptions
+                            defaultOptions
+                            loadOptions={loadSalesmanOptions}
+                            value={addForm.users_id}
+                            onChange={(val) => setAddForm({...addForm, users_id: val})}
+                            placeholder="Pilih Salesman"
+                          />
+                        </div>
+                        <div className="col-12">
+                          <label className="form-label small">Outlet/Customer <span className="text-danger">*</span></label>
+                          <AsyncSelect
+                            cacheOptions
+                            defaultOptions
+                            loadOptions={loadCustomerOptions}
+                            value={addForm.master_customer_id}
+                            onChange={(val) => setAddForm({...addForm, master_customer_id: val})}
+                            placeholder="Pilih Outlet/Customer"
+                          />
+                        </div>
+                        <div className="col-12">
+                          <label className="form-label small">Tanggal Rencana <span className="text-danger">*</span></label>
+                          <input 
+                            type="date"
+                            className="form-control"
+                            value={addForm.planned_visit_date}
+                            onChange={(e) => setAddForm({...addForm, planned_visit_date: e.target.value})}
+                          />
+                        </div>
+                        <div className="col-12">
+                          <label className="form-label small">Status <span className="text-danger">*</span></label>
+                          <Select
+                            options={statusOptions}
+                            value={statusOptions.find(opt => opt.value === addForm.status)}
+                            onChange={(val) => setAddForm({...addForm, status: val.value})}
+                          />
+                        </div>
+                      </div>
+                    </div>
+                    <div className="modal-footer">
+                      <button
+                        type="button"
+                        className="btn btn-secondary"
+                        onClick={() => setShowAddModal(false)}
+                      >
+                        Batal
+                      </button>
+                      <button
+                        type="button"
+                        className="btn btn-primary"
+                        onClick={handleAddSubmit}
+                        disabled={isLoading}
+                      >
+                        {isLoading ? "Menyimpan..." : "Simpan"}
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div className="modal-backdrop show"></div>
+            </>
+          )}
+
         </div>
       </div>
     </MasterLayout>

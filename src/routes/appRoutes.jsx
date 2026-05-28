@@ -25,6 +25,11 @@ import UserManagementPage from "../pages/master/UserManagementPage";
 import InteractionLogPage from "../pages/crm/InteractionLogPage";
 import Customer360Page from "../pages/crm/Customer360Page";
 import FollowUpPage from "../pages/crm/FollowUpPage";
+import RolePage from "../pages/setting/role/role";
+import RoleTreePage from "../pages/setting/role/tree";
+import UserPage from "../pages/setting/user/user";
+import CreateUserPage from "../pages/setting/user/create";
+import EditUserPage from "../pages/setting/user/edit";
 
 export default function AppRoutes() {
   return (
@@ -58,6 +63,13 @@ export default function AppRoutes() {
         <Route path="/crm/interaction-logs" element={<InteractionLogPage />} />
         <Route path="/crm/customer/:id" element={<Customer360Page />} />
         <Route path="/crm/follow-up" element={<FollowUpPage />} />
+
+        <Route path="/setting/role" element={<RolePage />} />
+        <Route path="/setting/role/tree" element={<RoleTreePage />} />
+        <Route path="/setting/user" element={<UserPage />} />
+        <Route path="/setting/user/create" element={<CreateUserPage />} />
+        <Route path="/setting/user/edit/:id" element={<EditUserPage />} />
+        
 
         <Route path="/menu/report/visit" element={<Visit />} />
         <Route path="/menu/pre-order" element={<PreOrder />} />

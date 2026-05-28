@@ -488,8 +488,48 @@ const StockTable = () => {
     }
   };
 
+  const H = "36px";
+  const B = "1px solid #e2e8f0";
+  const R = "8px";
+  const F = "13px";
+
+  const selectStyles = {
+    control: (base) => ({ ...base, minHeight: H, height: H, borderColor: "#e2e8f0", borderRadius: R, fontSize: F, boxShadow: "none", "&:hover": { borderColor: "#a0aec0" } }),
+    valueContainer: (base) => ({ ...base, padding: "0 10px" }),
+    indicatorsContainer: (base) => ({ ...base, height: H }),
+    placeholder: (base) => ({ ...base, color: "#a0aec0", fontSize: F }),
+    singleValue: (base) => ({ ...base, fontSize: F }),
+  };
+
   return (
     <>
+      <style>{`
+        .table-row:hover { cursor: pointer; background: #f8fafc !important; }
+        .custom-table th { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; color: #64748b; background: #f8fafc; border-bottom: 2px solid #e2e8f0; padding: 10px 12px; white-space: nowrap; }
+        .custom-table td { font-size: 13px; color: #334155; padding: 10px 12px; border-bottom: 1px solid #f1f5f9; vertical-align: middle; }
+        .act-btn { height: ${H}; width: ${H}; border-radius: ${R}; border: ${B}; display: flex; align-items: center; justify-content: center; cursor: pointer; background: #fff; color: #64748b; }
+        .act-btn:hover { background: #f1f5f9; }
+        .act-btn.green { background: #dcfce7; border-color: #86efac; color: #16a34a; }
+        .act-btn.green:hover { background: #bbf7d0; }
+        .act-btn.blue { background: #dbeafe; border-color: #93c5fd; color: #2563eb; }
+        .act-btn.blue:hover { background: #bfdbfe; }
+        .search-input { height: ${H}; border: ${B}; border-radius: ${R}; padding: 0 12px 0 34px; font-size: ${F}; outline: none; width: 190px; color: #334155; background: #fff; }
+        .search-input:focus { border-color: #3b82f6; box-shadow: 0 0 0 3px rgba(59,130,246,.1); }
+        .search-wrap { position: relative; display: flex; align-items: center; }
+        .search-wrap .s-icon { position: absolute; left: 10px; color: #94a3b8; pointer-events: none; }
+        .fdivider { width: 1px; height: 20px; background: #e2e8f0; flex-shrink: 0; }
+        
+        .status-badge { display: inline-flex; align-items: center; padding: 3px 10px; border-radius: 20px; font-size: 11px; font-weight: 600; }
+        .status-unregis { background: #f1f5f9; color: #64748b; }
+        .status-oncheck { background: #fef9c3; color: #a16207; }
+        .status-registered { background: #dcfce7; color: #16a34a; }
+        
+        .child-import { position: absolute; top: 40px; right: 0; background: white; border: 1px solid #e2e8f0; border-radius: 10px; box-shadow: 0 8px 24px rgba(0,0,0,0.1); z-index: 100; min-width: 170px; overflow: hidden; }
+        .child-import ul { list-style: none; margin: 0; padding: 6px; }
+        .child-import ul li { padding: 8px 12px; font-size: 13px; border-radius: 6px; cursor: pointer; color: #334155; display: flex; align-items: center; gap: 8px; }
+        .child-import ul li:hover { background: #f8fafc; }
+        .section-import { position: relative; }
+      `}</style>
       {loading && <Loader />}
       <Modal
         show={showClick}
@@ -564,37 +604,46 @@ const StockTable = () => {
       </Modal>
 
       <div className="col-lg-12">
-        <div className="card h-100">
-          <div className="card-header">
-            <h5 className="card-title mb-0">Stock Inventory</h5>
+        <div className="card h-100" style={{ borderRadius: "12px", border: "1px solid #e2e8f0", boxShadow: "0 1px 6px rgba(0,0,0,0.06)" }}>
+          <div className="card-header" style={{ background: "#fff", borderBottom: "1px solid #f1f5f9", borderRadius: "12px 12px 0 0", padding: "14px 18px" }}>
+            <div className="d-flex align-items-center gap-2">
+              <div style={{ width: 3, height: 18, background: "#3b82f6", borderRadius: 3 }} />
+              <h5 className="card-title mb-0" style={{ fontSize: "15px", fontWeight: 600, color: "#1e293b" }}>Stock Inventory</h5>
+            </div>
           </div>
-          <div className="card-body body-stock">
-            <div className="d-flex justify-content-between mb-3 header-stock">
-              <div>
-                <label className="me-3 show-brand">Show</label>
-                <Select
-                  options={[
-                    { value: 10, label: "10" },
-                    { value: 20, label: "20" },
-                    { value: 50, label: "50" },
-                  ]}
-                  onChange={(selectedOption) => {
-                    setPerPage(Number(selectedOption.value));
-                  }}
-                  defaultValue={{ value: perPage, label: `${perPage}` }}
-                  classNamePrefix="select-stock"
-                  className="d-inline-block w-auto"
-                />
+          <div className="card-body body-stock" style={{ padding: "14px 18px" }}>
+            <div className="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-3" style={{ background: "#fff", border: "1px solid #e2e8f0", borderRadius: "10px", padding: "10px 14px" }}>
+              <div className="d-flex align-items-center gap-2 flex-wrap">
+                <div className="d-flex align-items-center me-1">
+                  <span className="me-1" style={{ fontSize: "13px", color: "#64748b" }}>Show </span>
+                  <Select
+                    options={[
+                      { value: 10, label: "10" },
+                      { value: 20, label: "20" },
+                      { value: 50, label: "50" },
+                    ]}
+                    onChange={(selectedOption) => {
+                      setPerPage(Number(selectedOption.value));
+                    }}
+                    defaultValue={{ value: perPage, label: `${perPage}` }}
+                    classNamePrefix="select-stock"
+                    className="d-inline-block w-auto"
+                    styles={selectStyles}
+                  />
+                </div>
               </div>
 
               <div className="d-flex align-items-center gap-2">
-                <input
-                  type="text"
-                  placeholder="Search..."
-                  className="form-control search"
-                  value={search}
-                  onChange={(e) => setSearch(e.target.value)}
-                />
+                <div className="search-wrap">
+                  <Icon icon="mdi:magnify" className="s-icon" fontSize={16} />
+                  <input
+                    type="text"
+                    placeholder="Search..."
+                    className="search-input"
+                    value={search}
+                    onChange={(e) => setSearch(e.target.value)}
+                  />
+                </div>
                 {filter && (
                   <>
                     <div className="section-import">
@@ -603,43 +652,20 @@ const StockTable = () => {
                         overlay={renderTooltip("Data Import")}
                       >
                         <button
-                          className="btn btn-secondary button-fiture-inventory d-flex align-items-center justify-content-center button-export"
-                          data-bs-toggle="tooltip"
-                          data-bs-placement="top"
-                          data-bs-title="Tooltip on top"
+                          className="act-btn"
                           onClick={() => setOpenImport(!openImport)}
                         >
-                          <Icon
-                            icon={"uil:export"}
-                            className="iconify"
-                            fontSize={22}
-                          />
+                          <Icon icon={"uil:import"} fontSize={18} />
                         </button>
                       </OverlayTrigger>
                       {openImport && (
                         <div className="child-import">
                           <ul>
-                            <li
-                              className="d-flex align-items-center gap-1"
-                              onClick={() => handleDownloadFormat()}
-                            >
-                              <Icon
-                                icon={"tabler:file-download"}
-                                className="iconify"
-                                fontSize={18}
-                              />
-                              Download Format
+                            <li onClick={() => handleDownloadFormat()}>
+                              <Icon icon={"tabler:file-download"} fontSize={16} /> Download Format
                             </li>
-                            <li
-                              className="d-flex align-items-center gap-1"
-                              onClick={() => setOpenModalImport(true)}
-                            >
-                              <Icon
-                                icon={"uil:export"}
-                                className="iconify"
-                                fontSize={18}
-                              />
-                              Upload
+                            <li onClick={() => setOpenModalImport(true)}>
+                              <Icon icon={"uil:import"} fontSize={16} /> Upload
                             </li>
                           </ul>
                         </div>
@@ -651,7 +677,7 @@ const StockTable = () => {
                         overlay={renderTooltip("Data Export")}
                       >
                         <button
-                          className="btn btn-success button-fiture-inventory d-flex align-items-center justify-content-center export"
+                          className="act-btn green"
                           onClick={() => {
                             handleDownload(
                               filterSelected.selectedItem?.value,
@@ -663,32 +689,33 @@ const StockTable = () => {
                             );
                           }}
                         >
-                          <Icon
-                            icon={"tabler:file-download"}
-                            fontSize={24}
-                          />
+                          <Icon icon="mdi:file-export-outline" fontSize={18} />
                         </button>
                       </OverlayTrigger>
                     </div>
                   </>
                 )}
-                <button
-                  className="btn btn-secondary d-flex align-items-center justify-content-center filter"
-                  onClick={() => {
-                    filter ? setFilter(false) : setFilter(true);
-                  }}
-                >
-                  <Icon icon="line-md:filter" fontSize={24} />
-                </button>
-                <button
-                  onClick={() => {
-                    setMode("add");
-                    setShowClick(true);
-                  }}
-                  className="btn btn-outline-primary w-50 d-flex align-items-center justify-content-center button"
-                >
-                  <Icon icon="zondicons:add-outline" fontSize={22} />
-                </button>
+                <OverlayTrigger placement="top" overlay={renderTooltip("Filter")}>
+                  <button
+                    className="act-btn"
+                    onClick={() => {
+                      filter ? setFilter(false) : setFilter(true);
+                    }}
+                  >
+                    <Icon icon="line-md:filter" fontSize={18} />
+                  </button>
+                </OverlayTrigger>
+                <OverlayTrigger placement="top" overlay={renderTooltip("Create Stock")}>
+                  <button
+                    onClick={() => {
+                      setMode("add");
+                      setShowClick(true);
+                    }}
+                    className="act-btn blue"
+                  >
+                    <Icon icon="mdi:plus" fontSize={20} />
+                  </button>
+                </OverlayTrigger>
               </div>
             </div>
 
@@ -799,7 +826,7 @@ const StockTable = () => {
             )}
 
             <div className="table-responsive">
-              <table className="table basic-border-table mb-0">
+              <table className="table custom-table mb-0">
                 <thead>
                   <tr>
                     <th>No</th>
@@ -810,36 +837,26 @@ const StockTable = () => {
                     <th>Stock Allocation</th>
                     <th>Actual Stock</th>
                     <th>Date</th>
-                    <th id="action">Action</th>
+                    <th className="text-center">Action</th>
                   </tr>
                 </thead>
 
                 <tbody>
                   {currentData.length > 0 ? (
                     currentData.map((item, index) => (
-                      <tr key={item.id}>
-                        <td>{indexOfFirstRow + index + 1}</td>
+                      <tr key={item.id} className="table-row">
+                        <td style={{ color: "#94a3b8" }}>{indexOfFirstRow + index + 1}</td>
                         <td>{item.master_customer.company?.name}</td>
-                        <td>{item.master_customer.name}</td>
-                        {item.master_customer.status == "unregis" ? (
-                            <td>
-                              <span className="badge rounded-pill text-bg-secondary">
-                                Unregistered
-                              </span>
-                            </td>
-                          ) : item.master_customer.status == "registered" ? (
-                            <td>
-                              <span className="badge rounded-pill text-bg-success">
-                                Registered
-                              </span>
-                            </td>
-                          ) : (
-                            <td>
-                              <span className="badge rounded-pill text-bg-warning">
-                                On Check
-                              </span>
-                            </td>
-                          )}
+                        <td style={{ fontWeight: 600, color: "#1e293b" }}>{item.master_customer.name}</td>
+                        <td>
+                          {item.master_customer.status == "unregis" ? (
+                              <span className="status-badge status-unregis">Unregistered</span>
+                            ) : item.master_customer.status == "registered" ? (
+                              <span className="status-badge status-registered">Registered</span>
+                            ) : (
+                              <span className="status-badge status-oncheck">On Check</span>
+                            )}
+                        </td>
                         <td>{item.master_inventory.nama}</td>
                         <td>{item.alokasi_stock ? item.alokasi_stock : "-"}</td>
                         <td>{item.actual_stock ? item.actual_stock : "-"}</td>
@@ -848,41 +865,45 @@ const StockTable = () => {
                             ? new Date(item.created_at).toLocaleDateString(
                                 "id-ID",
                                 {
-                                  // weekday: "long",
-                                  day: "numeric",
-                                  month: "numeric",
+                                  day: "2-digit",
+                                  month: "2-digit",
                                   year: "numeric",
                                 },
                               )
                             : "-"}
                         </td>
-                        <td className="d-flex align-items-center">
-                          <button
-                            className="btn btn-warning btn-sm me-2 d-flex align-items-center"
-                            onClick={() => {
-                              setMode("edit");
-                              setSelectedStock(item);
-                              setShowClick(true);
-                              setSelectedAlokasi(item.alokasi_stock);
-                            }}
-                          >
-                            <Icon icon="mdi:pencil" width={18} />
-                          </button>
-                          <button
-                            className="btn btn-danger btn-sm d-flex align-items-center"
-                            onClick={() => handleDelete(item.id)}
-                          >
-                            <Icon
-                              icon="material-symbols:delete-outline"
-                              width={18}
-                            />
-                          </button>
+                        <td>
+                          <div className="d-flex align-items-center justify-content-center gap-1">
+                            <button
+                              className="btn btn-warning btn-sm d-flex align-items-center"
+                              style={{ borderRadius: 7 }}
+                              onClick={() => {
+                                setMode("edit");
+                                setSelectedStock(item);
+                                setShowClick(true);
+                                setSelectedAlokasi(item.alokasi_stock);
+                              }}
+                            >
+                              <Icon icon="mdi:pencil" width={15} />
+                            </button>
+                            <button
+                              className="btn btn-danger btn-sm d-flex align-items-center"
+                              style={{ borderRadius: 7 }}
+                              onClick={() => handleDelete(item.id)}
+                            >
+                              <Icon
+                                icon="material-symbols:delete-outline"
+                                width={15}
+                              />
+                            </button>
+                          </div>
                         </td>
                       </tr>
                     ))
                   ) : (
                     <tr>
-                      <td colSpan="11" className="text-center">
+                      <td colSpan="9" className="text-center py-5" style={{ color: "#94a3b8", fontSize: 14 }}>
+                        <Icon icon="mdi:inbox-outline" fontSize={32} style={{ display: "block", margin: "0 auto 8px" }} />
                         {loadingTable ? "Loading..." : "Data Kosong"}
                       </td>
                     </tr>
@@ -892,20 +913,21 @@ const StockTable = () => {
             </div>
 
             {/* Pagination */}
-            <div className="d-flex justify-content-between align-items-center mt-3 pagination-section">
-              <span>
+            <div className="d-flex justify-content-between align-items-center mt-3">
+              <span style={{ fontSize: 13, color: "#64748b" }}>
                 Showing {indexOfFirstRow + 1} to {pageTo} of{" "}
                 {totalPages * perPage} entries
               </span>
 
               <nav>
-                <ul className="pagination mb-0">
+                <ul className="pagination mb-0" style={{ gap: 4 }}>
                   <li className={`page-item ${page === 1 ? "disabled" : ""}`}>
                     <button
                       className="page-link"
+                      style={{ borderRadius: 8, fontSize: 13 }}
                       onClick={() => setPage(page - 1)}
                     >
-                      Previous
+                      ‹ Prev
                     </button>
                   </li>
 
@@ -918,6 +940,7 @@ const StockTable = () => {
                     >
                       <button
                         className="page-link"
+                        style={{ borderRadius: 8, fontSize: 13 }}
                         onClick={() =>
                           pageNumber !== "..." ? setPage(pageNumber) : null
                         }
@@ -934,9 +957,10 @@ const StockTable = () => {
                   >
                     <button
                       className="page-link"
+                      style={{ borderRadius: 8, fontSize: 13 }}
                       onClick={() => setPage(page + 1)}
                     >
-                      Next
+                      Next ›
                     </button>
                   </li>
                 </ul>
