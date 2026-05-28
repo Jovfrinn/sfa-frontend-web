@@ -131,7 +131,6 @@ const CustomerForm = ({ initialData = null, onCancel, mode = "add" }) => {
 
       const res = await axios.post(api_url, data, {
         headers: {
-          // "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
       });
