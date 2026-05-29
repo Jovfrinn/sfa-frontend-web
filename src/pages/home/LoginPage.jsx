@@ -85,78 +85,205 @@ export default function LoginPage() {
 
   return (
     <>
+      <style>{`
+        .login-premium-bg {
+          background-color: #f0f2f5;
+          min-height: 100vh;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          padding: 1rem;
+          font-family: 'Inter', sans-serif;
+        }
+        .login-premium-card {
+          background-color: #ffffff;
+          border-radius: 32px;
+          box-shadow: 0 24px 80px rgba(0, 0, 0, 0.07);
+          width: 100%;
+          max-width: 1100px;
+          padding: 3rem;
+          margin: auto;
+        }
+        .login-header-title {
+          font-size: 1.75rem;
+          font-weight: 800;
+          color: #111827;
+          letter-spacing: -1px;
+          line-height: 1;
+        }
+        .login-logo {
+          width: 48px;
+          height: auto;
+          border-radius: 12px;
+        }
+        .login-input-label {
+          font-size: 0.85rem;
+          font-weight: 500;
+          color: #374151;
+          margin-bottom: 0.5rem;
+        }
+        .login-input-field {
+          height: 52px;
+          border-radius: 12px;
+          border: 1px solid #e5e7eb;
+          font-size: 0.95rem;
+          padding: 0 16px;
+          color: #111827;
+          transition: all 0.2s ease;
+          box-shadow: none !important;
+          background-color: #fff;
+        }
+        .login-input-field::placeholder {
+          color: #9ca3af;
+        }
+        .login-input-field:focus {
+          border-color: #3b82f6;
+          box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1) !important;
+        }
+        .login-btn-primary {
+          background-color: #1a73e8;
+          border-radius: 50px;
+          height: 52px;
+          font-weight: 700;
+          font-size: 1rem;
+          color: #ffffff;
+          border: none;
+          transition: all 0.2s ease;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          text-align: center;
+          cursor: pointer;
+        }
+        .login-btn-primary:hover {
+          background-color: #1557b0;
+          transform: translateY(-1px);
+        }
+        .login-link {
+          color: #1a73e8;
+          font-weight: 700;
+          text-decoration: none;
+          font-size: 0.85rem;
+        }
+        .login-link:hover {
+          text-decoration: underline;
+        }
+        .login-hero-container {
+          position: relative;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          width: 100%;
+          padding-top: 2rem;
+        }
+        .login-hero-img {
+          width: 100%;
+          max-width: 400px;
+          z-index: 2;
+        }
+        .login-dot {
+          position: absolute;
+          width: 16px;
+          height: 16px;
+          border-radius: 50%;
+          filter: blur(0.5px);
+        }
+        
+        /* Responsive Adjustments */
+        @media (max-width: 991.98px) {
+          .login-premium-card {
+            padding: 2rem;
+            border-radius: 24px;
+          }
+          .login-header-title {
+            font-size: 2.5rem;
+            letter-spacing: -1px;
+          }
+          .login-hero-img {
+            max-width: 280px;
+          }
+          .login-hero-container {
+            padding-bottom: 2rem;
+          }
+        }
+        @media (max-width: 575.98px) {
+          .login-premium-card {
+            padding: 1.5rem;
+          }
+          .login-header-title {
+            font-size: 2rem;
+          }
+        }
+      `}</style>
+
       {isLoading && <Loader />}
 
-      <div className="login-page-wrapper">
-        <div className="bg-elements">
-          <div className="bg-card-top"></div>
-          <div className="bg-card-bottom"></div>
-        </div>
+      <div className="login-premium-bg">
+        <div className="login-premium-card">
+          <div className="row g-4 align-items-center">
+            
+            {/* Left Side: Branding & Illustration */}
+            <div className="col-12 col-lg-6 d-flex flex-column">
+              
+              <div className="d-flex align-items-center mb-2 mb-lg-4">
+                <img
+                  src="/assets/loader/Logo.png"
+                  alt="Logo"
+                  className="login-logo"
+                />
+                <div className="login-header-title mb-0">My Sales</div>
+              </div>
 
-        <div className="login-container">
-          <header className="logot-padding">
-            <img
-              src="/assets/loader/Logo.png"
-              alt="Logo Univerz Tech"
-              className="logo-img"
-            />
-          </header>
-          <main className="row align-items-center flex-grow-1 g-4 container-main">
-            {/* Login Form */}
-            <div className="col-12 col-lg-6 order-2 order-lg-2">
-              <div className="mx-auto" style={{ maxWidth: "500px" }}>
+              <div className="login-hero-container">
+                <img
+                  src="/assets/images/asset-landing.png"
+                  alt="3D Illustration"
+                  className="login-hero-img"
+                />
+                {/* Decorative Dots */}
+                <div className="login-dot" style={{ backgroundColor: '#4ade80', top: '20%', right: '15%' }}></div>
+                <div className="login-dot" style={{ backgroundColor: '#3b82f6', bottom: '25%', left: '10%' }}></div>
+                <div className="login-dot" style={{ backgroundColor: '#fbbf24', bottom: '5%', right: '25%' }}></div>
+              </div>
+            </div>
+
+            {/* Right Side: Form */}
+            <div className="col-12 col-lg-6 d-flex justify-content-center">
+              <div className="w-100" style={{ maxWidth: '400px' }}>
                 <form onSubmit={handleSubmit}>
-                  {/* Username Field */}
-                  <div className="mb-3">
-                    <label className="form-label fw-semibold">Username</label>
+                  
+                  {/* Username */}
+                  <div className="mb-4">
+                    <label className="form-label login-input-label">Username</label>
                     <input
                       type="text"
                       name="username"
-                      className={`form-control form-control-lg ${
-                        errors.username ? "is-invalid" : ""
-                      }`}
+                      className={`form-control login-input-field ${errors.username ? 'is-invalid' : ''}`}
                       placeholder="Enter your username"
                       value={formData.username}
                       onChange={handleInputChange}
-                      style={{
-                        borderRadius: "10px",
-                        borderWidth: "2px",
-                      }}
                     />
-                    {errors.username && (
-                      <div className="invalid-feedback d-block">
-                        {errors.username}
-                      </div>
-                    )}
-                    {errors.general && (
-                      <div className="invalid-feedback d-block">
-                        {errors.general}
-                      </div>
-                    )}
+                    {errors.username && <div className="invalid-feedback d-block">{errors.username}</div>}
+                    {errors.general && <div className="invalid-feedback d-block">{errors.general}</div>}
                   </div>
 
-                  {/* Password Field */}
-                  <div className="mb-3">
-                    <label className="form-label fw-semibold">Password</label>
+                  {/* Password */}
+                  <div className="mb-4">
+                    <label className="form-label login-input-label">Password</label>
                     <div className="position-relative">
                       <input
                         type={showPassword ? "text" : "password"}
                         name="password"
-                        className={`form-control form-control-lg ${
-                          errors.password ? "is-invalid" : ""
-                        }`}
+                        className={`form-control login-input-field ${errors.password ? 'is-invalid' : ''}`}
                         placeholder="Enter your password"
                         value={formData.password}
                         onChange={handleInputChange}
-                        style={{
-                          borderRadius: "10px",
-                          borderWidth: "2px",
-                          paddingRight: "45px",
-                        }}
+                        style={{ paddingRight: '48px' }}
                       />
                       <button
                         type="button"
-                        className="password-toggle-btn"
+                        className="position-absolute top-50 translate-middle-y border-0 bg-transparent d-flex align-items-center justify-content-center"
+                        style={{ right: '12px', color: '#9ca3af', padding: '0', cursor: 'pointer', zIndex: 5 }}
                         onClick={() => setShowPassword(!showPassword)}
                       >
                         {showPassword ? (
@@ -166,62 +293,30 @@ export default function LoginPage() {
                         )}
                       </button>
                     </div>
-                    {errors.password && (
-                      <div className="invalid-feedback d-block">
-                        {errors.password}
-                      </div>
-                    )}
+                    {errors.password && <div className="invalid-feedback d-block">{errors.password}</div>}
                   </div>
 
                   {/* Forgot Password */}
-                  <div className="d-flex justify-content-end mb-3">
-                    <a
-                      href="#"
-                      className="text-primary text-decoration-none fw-semibold"
-                    >
+                  <div className="d-flex justify-content-end mb-4">
+                    <a href="#" className="login-link">
                       Forgot Password?
                     </a>
                   </div>
 
-                  {/* Login Button */}
-                  <button
-                    type="submit"
-                    className="btn btn-primary btn-lg w-100 btn-login-custom"
-                  >
+                  {/* Submit Button */}
+                  <button type="submit" className="w-100 login-btn-primary">
                     Login
                   </button>
                 </form>
 
-                {/* Register Link */}
-                <div className="text-center mt-4 text-muted">
-                  Don't have an account?{" "}
-                  <a
-                    href="#"
-                    className="text-primary text-decoration-none fw-semibold"
-                  >
-                    Create Account
-                  </a>
+                {/* Register */}
+                <div className="text-center mt-4" style={{ fontSize: '0.85rem', color: '#6b7280', fontWeight: '500' }}>
+                  Don't have an account? <a href="#" className="login-link">Create Account</a>
                 </div>
               </div>
             </div>
 
-            {/* Hero Image */}
-            <div className="col-12 col-lg-6 order-1 order-lg-1">
-              <div
-                className="d-flex justify-content-center align-items-center position-relative container-img"
-                style={{ minHeight: "250px" }}
-              >
-                <img
-                  src="/assets/images/asset-landing.png"
-                  alt="3D Design Graphic"
-                  className="hero-img"
-                />
-                <div className="floating-dot dot-green"></div>
-                <div className="floating-dot dot-blue"></div>
-                <div className="floating-dot dot-orange"></div>
-              </div>
-            </div>
-          </main>
+          </div>
         </div>
       </div>
     </>

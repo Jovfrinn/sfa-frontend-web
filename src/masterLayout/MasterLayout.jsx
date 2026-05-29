@@ -163,7 +163,7 @@ const MasterLayout = ({ children }) => {
               className="light-logo"
             />
             <img
-              src="/assets/images/logo.png"
+              src="/assets/images/logo-dark.png"
               alt="site logo"
               className="ms-2 dark-logo"
             />
