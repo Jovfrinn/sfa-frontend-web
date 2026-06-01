@@ -1,77 +1,86 @@
-# SFA Web Dashboard
+# MySales — Web Dashboard
 
-React-based web dashboard for managing sales operations, customer relationships, and field team activities. Built as part of a portfolio Sales Force Automation (SFA) project.
+React-based management dashboard for MySales, a Field Sales CRM (SFA + CRM) for FMCG/distribution companies. Gives managers and administrators a centralized view of field operations, customer relationships, and team performance.
 
-## About
+## System Overview
 
-This is a portfolio project showcasing a field sales management system with integrated CRM capabilities. The dashboard provides managers and administrators with tools to monitor sales activities, manage customer interactions, approve journeys, and track visit metrics across distributed teams.
+MySales is a three-repo portfolio project: a Laravel REST API backend, this React web dashboard for managers, and a React Native iOS app for field sales staff. The dashboard consumes the backend API (`/api/v2/`) with Sanctum token authentication and covers the full management workflow — from approving customer registrations and journey plans to reviewing individual visit records and tracking follow-up commitments with field staff.
 
 ## Tech Stack
 
-- **React 18** with Vite
-- **Redux Toolkit** for state management (authentication)
-- **React Router v6** for navigation
-- **Axios** for API communication
-- **Bootstrap 5** + custom utility classes for styling
-- **SweetAlert2** for alerts and confirmations
-- **Iconify** (@iconify/react) for icon management
+| Component | Technology |
+|-----------|------------|
+| Framework | React 18 + Vite |
+| State Management | Redux Toolkit |
+| Routing | React Router v6 |
+| HTTP Client | Axios |
+| UI / Styling | Bootstrap 5 + custom utility classes |
+| Alerts | SweetAlert2 |
+| Icons | Iconify (`@iconify/react`) |
 
-## Features
+## Feature Overview
 
-- **Authentication** — Token-based login with session persistence
-- **Dashboard** — Visit summary, monthly trends, KPI charts
-- **Customer Management** — Outlet registry with multi-step approval workflow, interaction history
-- **Visit Reports** — Paginated visit log with detailed modal view per visit
-- **Journey Planning** — Create and approve sales routes with status tracking
-- **User Management** — Company-scoped user list, role assignment with hierarchy system
-- **CRM Interaction Log** — Global interaction tracking per outlet with filters and create/edit/delete actions
+**Dashboard & Reporting**
+- KPI summary cards: total visits, active customers, pending approvals
+- Monthly visit trend charts
+- Visit log with paginated results and a per-visit detail modal (stocks, selling out, pre-orders, competitor data)
+- Excel export for visit reports
+
+**Customer Management**
+- Outlet registry with multi-step registration approval workflow (salesman → supervisor → manager)
+- Interaction history tab per customer in the detail modal
+- One-click access to the Customer 360 page from the customer table
+
+**Journey Planning**
+- Create and view sales route plans
+- Approval workflow with status tracking (pending / approved / rejected / completed)
+
+**User & Role Management**
+- Company-scoped user list — managers only see users within their company subtree and descendant roles
+- Inline role assignment with hierarchy enforcement (cannot assign a role equal to or above your own)
+- Add new user form with company and role selection
+
+**CRM Section**
+The CRM section is the primary differentiator from a standard SFA system:
+
+- **Interaction Logs** — Full log of every customer interaction: visit notes, objections raised, follow-up dates, and resolution status. Filterable by status, date range, and customer name. Create, edit, and delete actions with role-based authorization.
+- **Customer 360** — A dedicated page per outlet aggregating all available data in one view: customer profile, pre-order summary, last 20 visits with drill-down, and complete interaction history.
+- **Follow-up Reminder** — A consolidated view of all open interaction logs with a `follow_up_date` on or before today. Color-coded rows: red for overdue, yellow for due today. Clicking a row navigates to the Customer 360 page. Follow-ups are automatically closed when the salesman checks in at that outlet.
 
 ## Local Setup
 
 ### Requirements
 
 - Node.js 18+
-- Backend running at `http://localhost:8000`
+- Backend (`sfa-backend`) running at `http://localhost:8000`
 
 ### Installation
 
-1. Clone the repository and navigate to the directory:
-   ```bash
-   cd sfa-frontend-web
-   ```
+```bash
+git clone https://github.com/Jovfrinn/sfa-frontend-web.git
+cd sfa-frontend-web
 
-2. Copy environment configuration:
-   ```bash
-   cp .env.example .env
-   ```
+cp .env.example .env
+```
 
-3. Configure `.env`:
-   ```
-   VITE_API_URI=http://localhost:8000/api/v2
-   VITE_STORAGE_URI=http://localhost:8000/storage
-   ```
+Edit `.env`:
 
-4. Install dependencies:
-   ```bash
-   npm install
-   ```
+```
+VITE_API_URI=http://localhost:8000/api/v2
+VITE_STORAGE_URI=http://localhost:8000/storage
+```
 
-5. Start the development server:
-   ```bash
-   npm run dev
-   ```
-
-   Dashboard will be available at `http://localhost:5173`
+```bash
+npm install
+npm run dev
+# Dashboard available at http://localhost:5173
+```
 
 ### Build for Production
 
 ```bash
 npm run build
 ```
-
-## Authentication
-
-The dashboard uses token-based authentication (Laravel Sanctum). Tokens are stored in browser `localStorage` and automatically included in API requests. Protected routes redirect unauthenticated users to the login page.
 
 ## Environment Variables
 
@@ -80,9 +89,54 @@ The dashboard uses token-based authentication (Laravel Sanctum). Tokens are stor
 | `VITE_API_URI` | Backend API base URL | `http://localhost:8000/api/v2` |
 | `VITE_STORAGE_URI` | File storage base URL | `http://localhost:8000/storage` |
 
-## Backend Integration
+Note: the variable names are `VITE_API_URI` and `VITE_STORAGE_URI` — not `VITE_API_URL` or `VITE_STORAGE_URL`.
 
-This dashboard requires the accompanying Laravel backend (`sfa-backend`) running with the API v2 endpoints at `/api/v2/*`. Refer to the backend repository for setup instructions.
+## Authentication
+
+Login uses username + password. On success, the backend returns a Sanctum Bearer token which is stored in browser `localStorage`. All subsequent API requests attach the token automatically via an Axios request interceptor. Protected routes redirect unauthenticated users to the login page.
+
+## Project Structure
+
+```
+src/
+├── components/
+│   ├── crm/              # InteractionLogModal, InteractionLogTable,
+│   │                     # InteractionLogList, Customer360VisitList
+│   ├── customer/         # CustomerTable, CustomerModalDetail
+│   └── ...               # Shared layout, form, and UI components
+├── pages/
+│   ├── crm/              # InteractionLogPage, Customer360Page, FollowUpPage
+│   ├── master/           # CustomerPage, UserManagementPage
+│   ├── report/           # VisitReportPage
+│   └── ...
+├── routes/
+│   └── appRoutes.jsx     # Route definitions
+├── redux/                # Auth slice (Redux Toolkit)
+└── config/               # API base URL helpers
+```
+
+## Key Routes
+
+| Path | Description |
+|------|-------------|
+| `/` | Login |
+| `/dashboard` | KPI summary and charts |
+| `/master/customers` | Customer/outlet management |
+| `/master/users` | User management with role assignment |
+| `/report/visits` | Paginated visit log |
+| `/crm/interaction-logs` | Full interaction log with filters |
+| `/crm/customer/:id` | Customer 360 page |
+| `/crm/follow-up` | Follow-up reminder list |
+| `/journey-plan` | Journey plan management |
+
+## Screenshots
+
+Screenshots of the dashboard, CRM section, and Customer 360 page are available in the project portfolio documentation.
+
+## Related Repositories
+
+- [sfa-backend](https://github.com/Jovfrinn/sfa-backend) — Laravel REST API (required dependency)
+- [sfa-frontend-mobile](https://github.com/Jovfrinn/sfa-frontend-mobile) — React Native iOS app for field sales staff
 
 ## License
 
